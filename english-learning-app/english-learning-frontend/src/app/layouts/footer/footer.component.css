@@ -1,0 +1,199 @@
+/* ========================================
+   FOOTER - VIOLET DESIGN SYSTEM
+   ======================================== */
+
+footer {
+  background: var(--color-bg-dark);
+  color: rgba(255, 255, 255, 0.75);
+  padding: var(--space-8) var(--space-6) var(--space-5);
+  font-family: var(--font-family-body);
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: var(--space-8);
+  margin-bottom: var(--space-6);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-logo {
+  font-family: var(--font-family-heading);
+  font-weight: var(--font-weight-black);
+  font-size: var(--font-size-2xl);
+  color: var(--color-primary);
+  margin-bottom: var(--space-3);
+}
+
+.footer-desc {
+  font-size: var(--font-size-md);
+  line-height: var(--line-height-relaxed);
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 300px;
+}
+
+.footer-col h4 {
+  font-family: var(--font-family-heading);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+  margin-bottom: var(--space-3);
+}
+
+.footer-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.footer-col ul li a {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-md);
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  cursor: pointer;
+}
+
+.footer-col ul li a:hover {
+  color: var(--color-primary);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--space-4);
+  text-align: center;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* ========================================
+   SOCIAL LINKS (optional)
+   ======================================== */
+
+.footer-social {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.footer-social a {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.7);
+  transition: all var(--transition-fast);
+}
+
+.footer-social a:hover {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   NEWSLETTER SIGNUP (optional)
+   ======================================== */
+
+.footer-newsletter {
+  margin-top: var(--space-4);
+}
+
+.footer-newsletter label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: var(--space-2);
+}
+
+.footer-newsletter .input-group {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.footer-newsletter input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-inverse);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-md);
+}
+
+.footer-newsletter input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-newsletter input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+}
+
+.footer-newsletter button {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-body);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.footer-newsletter button:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  footer {
+    padding: var(--space-6) var(--space-4) var(--space-4);
+  }
+  
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    text-align: center;
+  }
+  
+  .footer-desc {
+    max-width: none;
+    margin: 0 auto;
+  }
+  
+  .footer-col h4 {
+    margin-top: var(--space-4);
+  }
+  
+  .footer-col:first-child h4 {
+    margin-top: 0;
+  }
+  
+  .footer-social {
+    justify-content: center;
+  }
+  
+  .footer-newsletter .input-group {
+    flex-direction: column;
+  }
+  
+  .footer-newsletter button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,52 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý Tag / Chủ đề</h1>
+  </div>
+
+  <!-- Add new tag -->
+  <div class="add-form">
+    <input type="text" [(ngModel)]="newTag.name" placeholder="Tên tag..." (input)="newTag.slug = autoSlug(newTag.name)" />
+    <input type="text" [(ngModel)]="newTag.slug" placeholder="slug" class="mono" />
+    <input type="text" [(ngModel)]="newTag.icon" placeholder="📺" class="icon-input" />
+    <button class="btn btn-primary" (click)="addTag()" [disabled]="!newTag.name || loading">+ Thêm</button>
+  </div>
+
+  <table class="admin-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th style="width:30px"></th>
+        <th>Icon</th>
+        <th>Tên</th>
+        <th>Slug</th>
+        <th>Thứ tự</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let tag of tags; let i = index">
+        <td class="td-order">
+          <button class="move-btn" (click)="moveTag(i, -1)" [disabled]="i === 0">▲</button>
+          <button class="move-btn" (click)="moveTag(i, 1)" [disabled]="i === tags.length - 1">▼</button>
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="tag.icon" class="icon-input" (blur)="saveTag(tag)" />
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="tag.name" (blur)="saveTag(tag)" class="inline-input" />
+        </td>
+        <td>
+          <input type="text" [(ngModel)]="tag.slug" (blur)="saveTag(tag)" class="inline-input mono" />
+        </td>
+        <td>{{ tag.display_order }}</td>
+        <td>
+          <button class="btn-icon delete" (click)="deleteTag(tag._id)" title="Xóa">🗑️</button>
+        </td>
+      </tr>
+      <tr *ngIf="tags.length === 0">
+        <td colspan="6" class="text-center">Chưa có tag nào</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+</div>

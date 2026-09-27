@@ -1,0 +1,59 @@
+<div class="dashboard">
+  <!-- Welcome -->
+  <div class="welcome-card">
+    <div class="welcome-text">
+      <h1>Xin chào, Admin</h1>
+      <p>Tổng quan hệ thống quản trị</p>
+    </div>
+    <div class="welcome-actions">
+      <button class="btn btn-primary" (click)="goToAdd()">+ Thêm mới</button>
+      <button class="btn btn-outline" (click)="refresh()">🔄 Làm mới</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <a class="stat-card" *ngFor="let stat of stats" [routerLink]="stat.link">
+      <div class="stat-icon" [style.background]="stat.bg">{{ stat.icon }}</div>
+      <div class="stat-info">
+        <span class="stat-number">{{ stat.count }}</span>
+        <span class="stat-label">{{ stat.label }}</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- Bottom row -->
+  <div class="bottom-row">
+    <div class="card recent-section">
+      <div class="card-header">
+        <h2>Video gần đây</h2>
+        <a class="card-more" routerLink="/admin/reading">Xem tất cả →</a>
+      </div>
+      <div class="video-list">
+        <div class="video-item" *ngFor="let v of recentVideos">
+          <span class="vid-emoji" [style.background]="v.bg || '#eee'">{{ v.emoji || '🎬' }}</span>
+          <div class="vid-info">
+            <span class="vid-title">{{ v.title }}</span>
+            <span class="vid-meta">{{ v.level }} · {{ v.views || 0 }} lượt</span>
+          </div>
+          <span class="vid-date">{{ v.createdAt | date:'dd/MM' }}</span>
+        </div>
+        <div class="video-item empty" *ngIf="recentVideos.length === 0">
+          <span>Chưa có video nào</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card quick-section">
+      <div class="card-header">
+        <h2>Truy cập nhanh</h2>
+      </div>
+      <div class="quick-grid">
+        <a class="quick-item" *ngFor="let q of quickLinks" [routerLink]="q.link">
+          <span class="quick-icon">{{ q.icon }}</span>
+          <span class="quick-label">{{ q.label }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

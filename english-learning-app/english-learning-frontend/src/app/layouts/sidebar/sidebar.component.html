@@ -1,0 +1,49 @@
+<aside class="sidebar" [class.collapsed]="collapsed" [class.open]="mobileOpen">
+  <div class="sidebar-header">
+    <a class="sidebar-logo" routerLink="/">
+      <span class="logo-icon">📚</span>
+      <span class="logo-text" *ngIf="!collapsed">Tự Học English</span>
+    </a>
+    <button class="sidebar-toggle" (click)="toggleCollapse()" aria-label="Toggle sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path *ngIf="!collapsed" d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+        <path *ngIf="collapsed" d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of navItems">
+        <a 
+          [routerLink]="item.route" 
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          class="nav-link"
+          [title]="collapsed ? item.label : ''"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
+          <span class="nav-badge" *ngIf="item.badge">{{ item.badge }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer" *ngIf="!collapsed">
+    <div class="user-info">
+      <div class="user-avatar">👤</div>
+      <div class="user-details">
+        <span class="user-name">Nguyễn Văn A</span>
+        <span class="user-role">Free User</span>
+      </div>
+    </div>
+    <button class="btn-upgrade" routerLink="/pricing">
+      <span class="upgrade-icon">⭐</span>
+      <span>Nâng cấp PRO</span>
+    </button>
+  </div>
+</aside>
+
+<!-- Mobile overlay -->
+<div class="sidebar-overlay" *ngIf="mobileOpen" (click)="closeMobile()"></div>

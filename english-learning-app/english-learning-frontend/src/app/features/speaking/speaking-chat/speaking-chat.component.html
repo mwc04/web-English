@@ -1,0 +1,283 @@
+<!-- NAVBAR -->
+<!-- <nav class="navbar">
+  <div class="logo">TỰ HỌC ENGLISH</div>
+  <ul class="nav-links">
+    <li><a (click)="navigate('/grammar')"><span class="nav-icon">📖</span> Grammar</a></li>
+    <li><a (click)="navigate('/vocabulary')"><span class="nav-icon">📝</span> Vocab</a></li>
+    <li><a (click)="navigate('/listening')"><span class="nav-icon">🎧</span> Listening</a></li>
+    <li><a class="active" (click)="navigate('/speaking')"><span class="nav-icon">🗣️</span> Speaking</a></li>
+    <li><a (click)="navigate('/reading')"><span class="nav-icon">📚</span> Reading</a></li>
+    <li><a (click)="navigate('/writing')"><span class="nav-icon">✏️</span> Writing</a></li>
+    <li><a (click)="navigate('/exam')"><span class="nav-icon">📋</span> Test</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-icon-btn" title="Thông báo">🔔</button>
+    <div class="avatar">👤</div>
+  </div>
+</nav> -->
+
+<!-- PAGE WRAPPER -->
+<div class="speaking-page">
+
+  <!-- PAGE TITLE -->
+  <div class="page-header">
+    <h1 class="page-title">CHINH PHỤC PHẦN SPEAKING TIẾNG ANH</h1>
+    <p class="page-subtitle">Luyện nói cùng với AI để cải thiện bạn nói</p>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="speaking-layout">
+
+    <!-- LEFT: 3D Avatar Panel -->
+    <div class="avatar-panel">
+      <div class="avatar-3d-wrap">
+        <!-- Animated AI avatar -->
+        <div class="avatar-bg-ring ring-1"></div>
+        <div class="avatar-bg-ring ring-2"></div>
+        <div class="avatar-bg-ring ring-3"></div>
+        <div class="avatar-3d-inner">
+          <div class="ai-face">
+            <div class="ai-face-glow"></div>
+            <svg viewBox="0 0 200 200" class="ai-svg" xmlns="http://www.w3.org/2000/svg">
+              <!-- Head shape -->
+              <ellipse cx="100" cy="95" rx="62" ry="72" fill="#e8f4fd" stroke="#00bcd4" stroke-width="2"/>
+              <!-- Hair -->
+              <ellipse cx="100" cy="40" rx="62" ry="30" fill="#2d3a4a"/>
+              <rect x="38" y="40" width="124" height="20" fill="#2d3a4a"/>
+              <!-- Ears -->
+              <ellipse cx="36" cy="100" rx="10" ry="14" fill="#e8f4fd" stroke="#00bcd4" stroke-width="1.5"/>
+              <ellipse cx="164" cy="100" rx="10" ry="14" fill="#e8f4fd" stroke="#00bcd4" stroke-width="1.5"/>
+              <!-- Eyes -->
+              <ellipse cx="78" cy="95" rx="12" ry="14" fill="#fff" stroke="#b0c4d0" stroke-width="1"/>
+              <ellipse cx="122" cy="95" rx="12" ry="14" fill="#fff" stroke="#b0c4d0" stroke-width="1"/>
+              <circle cx="80" cy="96" r="7" fill="#00bcd4"/>
+              <circle cx="124" cy="96" r="7" fill="#00bcd4"/>
+              <circle cx="82" cy="93" r="2.5" fill="#005f6b"/>
+              <circle cx="126" cy="93" r="2.5" fill="#005f6b"/>
+              <circle cx="84" cy="91" r="1" fill="#fff"/>
+              <circle cx="128" cy="91" r="1" fill="#fff"/>
+              <!-- Eyebrows -->
+              <path d="M66 80 Q78 74 90 80" stroke="#2d3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M110 80 Q122 74 134 80" stroke="#2d3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <!-- Nose -->
+              <path d="M97 105 Q100 118 103 105" stroke="#b0a090" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+              <!-- Mouth (animated smile) -->
+              <path class="ai-mouth" d="M82 135 Q100 147 118 135" stroke="#2d3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <!-- Cheeks -->
+              <ellipse cx="68" cy="120" rx="14" ry="8" fill="rgba(255,100,100,0.12)"/>
+              <ellipse cx="132" cy="120" rx="14" ry="8" fill="rgba(255,100,100,0.12)"/>
+              <!-- Neck -->
+              <rect x="84" y="162" width="32" height="22" rx="6" fill="#e8f4fd" stroke="#00bcd4" stroke-width="1.5"/>
+            </svg>
+            <!-- Sound wave when speaking -->
+            <div class="sound-wave" [class.active]="isAiSpeaking">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="avatar-label">AI Tutor</div>
+          <div class="avatar-status" [ngClass]="{'speaking': isAiSpeaking, 'listening': isListening, 'idle': !isAiSpeaking && !isListening && !continuousMode, 'continuous': continuousMode && !isAiSpeaking && !isListening}">
+            <span class="status-dot"></span>
+            {{ isAiSpeaking ? 'Đang nói...' : isListening ? 'Đang nghe...' : continuousMode ? 'Chế độ hội thoại' : 'Sẵn sàng' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Topic selector -->
+      <div class="topic-selector">
+        <label class="topic-label">Chủ đề luyện nói</label>
+        <select class="topic-select" [(ngModel)]="selectedTopic" (change)="onTopicChange()">
+          <option value="daily">Giao tiếp hàng ngày</option>
+          <option value="work">Môi trường công việc</option>
+          <option value="travel">Du lịch & Khách sạn</option>
+          <option value="academic">Học thuật & Thuyết trình</option>
+          <option value="ielts">IELTS Speaking Part 1</option>
+          <option value="ielts2">IELTS Speaking Part 2</option>
+          <option value="toeic">TOEIC Speaking</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- RIGHT: Chat + Grammar Panel -->
+    <div class="chat-grammar-wrap">
+
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span class="chat-header-icon">💬</span>
+          <span class="chat-header-text">ĐOẠN CHAT TRÒ CHUYỆN CÙNG VỚI TRỢ LÝ AI</span>
+          <button class="header-btn" (click)="toggleHistory()" title="Lịch sử hội thoại">📋</button>
+          <button class="clear-btn" (click)="clearChat()" title="Xóa hội thoại">🗑</button>
+        </div>
+
+        <!-- History panel -->
+        <div class="history-panel" *ngIf="showHistory">
+          <div class="history-header">
+            <span>📋 Lịch sử hội thoại</span>
+            <button class="history-close" (click)="showHistory=false">✕</button>
+          </div>
+          <div class="history-list">
+            <div class="history-empty" *ngIf="savedConversations.length===0">
+              Chưa có cuộc hội thoại nào được lưu.
+            </div>
+            <div class="history-item" *ngFor="let conv of savedConversations" (click)="loadConversation(conv)">
+              <div class="history-item-top">
+                <span class="history-title">{{ conv.title }}</span>
+                <button class="history-del" (click)="deleteConversation(conv.id, $event)" title="Xóa">🗑</button>
+              </div>
+              <div class="history-meta">
+                <span class="history-tag">{{ conv.topicLabel }}</span>
+                <span>{{ conv.messageCount }} tin nhắn</span>
+                <span>{{ conv.timestamp | date:'dd/MM HH:mm' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Messages area -->
+        <div class="chat-messages" #chatBox>
+          <div class="chat-empty" *ngIf="messages.length === 0">
+            <div class="empty-icon">🎙️</div>
+            <p>Hãy bắt đầu nói hoặc gõ để trò chuyện cùng AI!</p>
+          </div>
+
+          <div
+            class="message-row"
+            *ngFor="let msg of messages"
+            [ngClass]="msg.role"
+          >
+            <div class="msg-avatar" *ngIf="msg.role === 'ai'">🤖</div>
+            <div class="message-bubble" [ngClass]="msg.role">
+              <p style="color: #000 !important;" class="msg-text">{{ msg.text }}</p>
+              <div class="msg-meta" style="color: #000 !important;">
+                <span class="msg-time">{{ msg.time }}</span>
+                <button class="msg-speak" *ngIf="msg.role === 'ai'" (click)="speakText(msg.text)" title="Nghe lại">🔊</button>
+                <span class="msg-score" *ngIf="msg.score">⭐ {{ msg.score }}/10</span>
+              </div>
+            </div>
+            <div class="msg-avatar user-av" *ngIf="msg.role === 'user'">👤</div>
+          </div>
+
+          <!-- Typing indicator -->
+          <div class="typing-indicator" *ngIf="isTyping">
+            <div class="msg-avatar">🤖</div>
+            <div class="typing-bubble">
+              <span></span><span></span><span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input area (text mode) -->
+        <div class="chat-input-area" *ngIf="inputMode === 'keyboard'">
+          <input
+            class="chat-input"
+            type="text"
+            placeholder="Nhập câu trả lời của bạn bằng tiếng Anh..."
+            [(ngModel)]="textInput"
+            (keydown.enter)="sendText()"
+            [disabled]="isTyping"
+          />
+          <button class="send-btn" (click)="sendText()" [disabled]="!textInput.trim() || isTyping">
+            ➤
+          </button>
+        </div>
+
+        <!-- Mic mode indicator -->
+        <div class="mic-mode-hint" *ngIf="inputMode === 'mic'">
+          <div class="mic-live" [class.recording]="isListening" [class.continuous]="continuousMode && !isListening && !isAiSpeaking">
+            <div class="mic-pulse" *ngIf="isListening"></div>
+            <ng-container *ngIf="isListening">
+              <div class="mic-status-text">🔴 Đang nghe... (nói điều gì đó)</div>
+              <div class="mic-transcript" *ngIf="currentTranscript">{{ currentTranscript }}</div>
+            </ng-container>
+            <ng-container *ngIf="!isListening && continuousMode && !isAiSpeaking">⏳ Chờ AI trả lời xong...</ng-container>
+            <ng-container *ngIf="!isListening && !continuousMode">🎤 Nhấn mic để bắt đầu hội thoại</ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grammar Panel -->
+      <div class="grammar-panel" [class.visible]="showGrammarPanel">
+
+        <div class="grammar-empty" *ngIf="!grammarFeedback">
+          <div class="grammar-empty-icon">✏️</div>
+          <p>Nhận xét ngữ pháp sẽ xuất hiện sau khi bạn nói hoặc nhập câu.</p>
+        </div>
+
+        <ng-container *ngIf="grammarFeedback">
+
+          <div class="grammar-section">
+            <div class="grammar-original">{{ grammarFeedback.original }}</div>
+          </div>
+
+          <div class="grammar-corrections">
+            <div class="correction-row wrong">
+              <span class="correction-icon">✕</span>
+              <span class="correction-badge wrong">{{ grammarFeedback.original }}</span>
+            </div>
+            <div class="correction-row right">
+              <span class="correction-icon">✓</span>
+              <span class="correction-badge right">{{ grammarFeedback.corrected }}</span>
+            </div>
+          </div>
+
+          <div class="grammar-note">
+            {{ grammarFeedback.note }}
+          </div>
+
+          <button class="grammar-advanced-btn" (click)="getAdvancedFeedback()">
+            ✦ Phản hồi nâng cao
+          </button>
+
+        </ng-container>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM CONTROLS -->
+  <div class="controls-row">
+
+    <!-- Keyboard btn -->
+    <div class="control-item">
+      <button
+        class="ctrl-btn"
+        [class.active]="inputMode === 'keyboard'"
+        (click)="setMode('keyboard')"
+        title="Nhập bàn phím"
+      >⌨️</button>
+      <span class="ctrl-label">nhập bàn phím</span>
+    </div>
+
+    <!-- Mic btn (center, larger) -->
+    <div class="control-item center">
+      <button
+        class="ctrl-btn mic-btn"
+        [class.recording]="isListening"
+        (click)="toggleMic()"
+        title="Bắt đầu / dừng nói"
+      >
+        <span class="mic-icon">🎙️</span>
+        <div class="mic-ring" *ngIf="isListening"></div>
+      </button>
+    </div>
+
+    <!-- Hint btn -->
+    <div class="control-item">
+      <button
+        class="ctrl-btn"
+        [class.active]="showHint"
+        (click)="toggleHint()"
+        title="Gợi ý"
+      >💡</button>
+      <span class="ctrl-label">gợi ý</span>
+    </div>
+
+  </div>
+
+  <!-- HINT BOX -->
+  <div class="hint-box" *ngIf="showHint">
+    <div class="hint-header">💡 Gợi ý câu trả lời</div>
+    <p class="hint-text">{{ currentHint }}</p>
+  </div>
+
+</div>

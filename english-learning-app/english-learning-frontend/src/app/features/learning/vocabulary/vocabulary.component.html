@@ -1,0 +1,107 @@
+<!-- NAVBAR -->
+<!-- <nav class="navbar">
+  <div class="logo">TỰ HỌC ENGLISH</div>
+  <ul class="nav-links">
+    <li><a [class.active]="true">Từ vựng</a></li>
+    <li><a>Ngữ pháp</a></li>
+    <li><a>Luyện nghe</a></li>
+    <li><a>Luyện đọc</a></li>
+    <li><a>Luyện nói</a></li>
+    <li><a>Luyện viết</a></li>
+    <li><a>Thi thử</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-icon-btn">🔔</button>
+    <div class="avatar">👤</div>
+  </div>
+</nav> -->
+
+<!-- PAGE HEADER -->
+<div class="page-header vocab-header">
+  <h1 class="page-title">CHINH PHỤC TỪ VỰNG TIẾNG ANH</h1>
+  <p class="page-subtitle">Học từ vựng theo chủ đề</p>
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" placeholder="Tìm kiếm chủ đề từ vựng..." [(ngModel)]="searchQuery" (input)="onSearch()" />
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-body">
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-tabs">
+      <button class="tab-btn" *ngFor="let tab of tabs"
+        [class.active]="selectedTab === tab.value"
+        (click)="selectTab(tab.value)">
+        {{ tab.label }}
+      </button>
+    </div>
+    <div class="filter-right">
+      <select class="filter-select" [(ngModel)]="selectedSort" (change)="onFilter()">
+        <option value="default">Mặc định</option>
+        <option value="progress">Tiến độ cao</option>
+        <option value="words">Nhiều từ nhất</option>
+        <option value="name">Tên A-Z</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+
+  <!-- VOCAB GRID -->
+  <div class="cards-grid" *ngIf="!loading">
+    <div class="vocab-card" *ngFor="let item of filteredTopics" (click)="goToTopic(item.id)">
+
+      <!-- Card top badge row -->
+      <div class="card-top">
+        <span class="topic-badge" [ngClass]="item.colorClass">{{ item.category }}</span>
+        <span class="word-count">{{ item.wordCount }} từ</span>
+      </div>
+
+      <!-- Icon + Title -->
+      <div class="card-main">
+        <div class="topic-icon" [ngClass]="item.colorClass">{{ item.icon }}</div>
+        <div class="card-info">
+          <h3 class="card-title">{{ item.title }}</h3>
+          <p class="card-subtitle">{{ item.subtitle }}</p>
+        </div>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-section">
+        <div class="progress-header">
+          <span class="progress-label">Tiến độ học</span>
+          <span class="progress-pct">{{ item.progress }}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [ngClass]="item.colorClass" [style.width.%]="item.progress"></div>
+        </div>
+        <div class="progress-footer">
+          <span>{{ item.learned }}/{{ item.wordCount }} từ</span>
+          <span class="status-dot" [ngClass]="getStatusClass(item.progress)">{{ getStatusText(item.progress) }}</span>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="card-footer">
+        <button class="start-btn" [ngClass]="item.colorClass" (click)="goToTopic(item.id); $event.stopPropagation()">
+          {{ item.progress > 0 ? 'Tiếp tục học' : 'Bắt đầu học' }} →
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+    <button class="page-btn" [disabled]="currentPage === 1" (click)="changePage(currentPage - 1)">‹</button>
+    <button class="page-btn" *ngFor="let p of pages"
+      [class.active]="p === currentPage"
+      (click)="changePage(p)">{{ p }}</button>
+    <button class="page-btn" [disabled]="currentPage === totalPages" (click)="changePage(currentPage + 1)">›</button>
+  </div>
+
+</div>

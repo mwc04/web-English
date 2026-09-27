@@ -1,0 +1,156 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý Ngữ pháp</h1>
+    <button class="btn btn-primary" (click)="openAdd()">+ Thêm mới</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Tìm kiếm ngữ pháp..." [(ngModel)]="searchQuery" (input)="applyFilter()" />
+  </div>
+
+  <table class="admin-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th>Tên</th>
+        <th>Giải thích</th>
+        <th>Chủ đề</th>
+        <th>Cấp độ</th>
+        <th>Độ khó</th>
+        <th>Ngày tạo</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of filteredItems">
+        <td><strong>{{ item.rule_name }}</strong></td>
+        <td>{{ item.explanation }}</td>
+        <td><span class="badge badge-category">{{ catLabel(item.category) }}</span></td>
+        <td><span class="badge" [ngClass]="'level-' + item.level">{{ levelLabel(item.level) }}</span></td>
+        <td><span class="badge" [ngClass]="'diff-' + item.difficulty">{{ diffLabel(item.difficulty) }}</span></td>
+        <td>{{ item.createdAt | date:'dd/MM/yyyy' }}</td>
+        <td class="actions">
+          <button class="btn-icon edit" (click)="openEdit(item)" title="Sửa">✏️</button>
+          <button class="btn-icon delete" (click)="deleteItem(item._id)" title="Xóa">🗑️</button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredItems.length === 0">
+        <td colspan="7" class="text-center">Không có dữ liệu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal modal-lg" (click)="$event.stopPropagation()">
+    <h2>{{ editItem ? 'Sửa ngữ pháp' : 'Thêm ngữ pháp' }}</h2>
+
+    <!-- Cơ bản -->
+    <div class="form-row">
+      <div class="form-group flex-2">
+        <label>Tên quy tắc</label>
+        <input type="text" [(ngModel)]="formData.rule_name" />
+      </div>
+      <div class="form-group">
+        <label>Chủ đề</label>
+        <select [(ngModel)]="formData.category">
+          <option *ngFor="let c of categories" [value]="c.value">{{ c.label }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cấp độ</label>
+        <select [(ngModel)]="formData.level">
+          <option *ngFor="let l of levels" [value]="l.value">{{ l.label }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Độ khó</label>
+        <select [(ngModel)]="formData.difficulty">
+          <option *ngFor="let d of diffs" [value]="d.value">{{ d.label }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Giải thích</label>
+      <textarea [(ngModel)]="formData.explanation" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Ví dụ</label>
+      <textarea [(ngModel)]="formData.example" rows="2"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Cấu trúc (công thức)</label>
+      <input type="text" [(ngModel)]="formData.structure" placeholder="VD: S + V(s/es) + O" />
+    </div>
+
+    <div class="form-group">
+      <label>Cách dùng (mỗi dòng một ý)</label>
+      <textarea [(ngModel)]="formData.usageText" rows="3" placeholder="VD: Diễn tả thói quen hàng ngày"></textarea>
+    </div>
+
+    <!-- Nội dung chi tiết -->
+    <details class="content-details" [(open)]="showContent">
+      <summary class="content-summary">📝 Nội dung chi tiết (hiển thị ở trang học)</summary>
+
+      <div class="form-group">
+        <label>Định nghĩa</label>
+        <div class="editor-wrap">
+          <div class="editor-toolbar">
+            <button type="button" (click)="execCmd('bold')" title="Đậm"><b>B</b></button>
+            <button type="button" (click)="execCmd('italic')" title="Nghiêng"><i>I</i></button>
+            <button type="button" (click)="execCmd('underline')" title="Gạch chân"><u>U</u></button>
+          </div>
+          <div class="editor-content" contenteditable="true" data-field="defText" (input)="onContent($event)"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Ví dụ (mỗi dòng một câu)</label>
+        <div class="editor-wrap">
+          <div class="editor-toolbar">
+            <button type="button" (click)="execCmd('bold')" title="Đậm"><b>B</b></button>
+            <button type="button" (click)="execCmd('italic')" title="Nghiêng"><i>I</i></button>
+            <button type="button" (click)="execCmd('underline')" title="Gạch chân"><u>U</u></button>
+          </div>
+          <div class="editor-content" contenteditable="true" data-field="examplesText" (input)="onContent($event)"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Quy tắc (mỗi dòng một quy tắc)</label>
+        <div class="editor-wrap">
+          <div class="editor-toolbar">
+            <button type="button" (click)="execCmd('bold')" title="Đậm"><b>B</b></button>
+            <button type="button" (click)="execCmd('italic')" title="Nghiêng"><i>I</i></button>
+            <button type="button" (click)="execCmd('underline')" title="Gạch chân"><u>U</u></button>
+          </div>
+          <div class="editor-content" contenteditable="true" data-field="rulesText" (input)="onContent($event)"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Lỗi thường gặp (mỗi dòng một lỗi)</label>
+        <div class="editor-wrap">
+          <div class="editor-toolbar">
+            <button type="button" (click)="execCmd('bold')" title="Đậm"><b>B</b></button>
+            <button type="button" (click)="execCmd('italic')" title="Nghiêng"><i>I</i></button>
+            <button type="button" (click)="execCmd('underline')" title="Gạch chân"><u>U</u></button>
+          </div>
+          <div class="editor-content" contenteditable="true" data-field="errorsText" (input)="onContent($event)"></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" (click)="showModal = false">Hủy</button>
+      <button class="btn btn-primary" (click)="save()">Lưu</button>
+    </div>
+  </div>
+</div>

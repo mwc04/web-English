@@ -1,0 +1,283 @@
+/* ========================================
+   VIOLET DESIGN SYSTEM - DESIGN TOKENS
+   ======================================== */
+
+/* ---- Google Fonts Import ---- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&family=Noto+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ---- CSS Custom Properties ---- */
+:root {
+  /* ===== COLOR SYSTEM ===== */
+  
+  /* Primary - Violet */
+  --color-primary: #7c3aed;
+  --color-primary-light: #ede9fe;
+  --color-primary-dark: #6d28d9;
+  --color-primary-gradient-start: #a855f7;
+  --color-primary-gradient-end: #7c3aed;
+  --color-primary-gradient: linear-gradient(90deg, var(--color-primary-gradient-start), var(--color-primary-gradient-end));
+  
+  /* Secondary - Amber/Orange */
+  --color-secondary: #f59e0b;
+  --color-secondary-bg: #fff7e6;
+  --color-secondary-dark: #d97706;
+  --color-secondary-gradient: linear-gradient(90deg, #f59e0b, #fbbf24);
+  
+  /* Success - Green */
+  --color-success: #22c55e;
+  --color-success-bg: #ecfdf3;
+  --color-success-dark: #16a34a;
+  --color-success-gradient: linear-gradient(90deg, #22c55e, #4ade80);
+  
+  /* Exam Blue (chỉ cho test pages) */
+  --color-exam: #0088cc;
+  --color-exam-light: #e8f4fd;
+  --color-exam-dark: #006fa3;
+  --color-exam-gradient: linear-gradient(90deg, #0088cc, #00b8d4);
+  
+  /* Error/Warning */
+  --color-error: #ef4444;
+  --color-error-bg: #fef2f2;
+  --color-error-dark: #dc2626;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  
+  /* Neutral */
+  --color-text-primary: #1f2430;
+  --color-text-secondary: #6b7280;
+  --color-text-tertiary: #9ca3af;
+  --color-text-inverse: #ffffff;
+  --color-text-link: #7c3aed;
+  
+  --color-border-light: #e5e7eb;
+  --color-border-medium: #d1d5db;
+  --color-border-dark: #9ca3af;
+  
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-bg-tertiary: #f3f4f6;
+  --color-bg-dark: #1f2430;
+  --color-bg-overlay: rgba(0, 0, 0, 0.45);
+  
+  /* Gradients */
+  --gradient-hero: linear-gradient(180deg, #f5f3ff 0%, #ffffff 100%);
+  --gradient-welcome: linear-gradient(135deg, var(--color-primary-gradient-start), var(--color-primary-gradient-end));
+  --gradient-violet: linear-gradient(90deg, var(--color-primary-gradient-start), var(--color-primary-gradient-end));
+  --gradient-card-hover: linear-gradient(135deg, rgba(124, 58, 237, 0.05) 0%, rgba(168, 85, 247, 0.05) 100%);
+  
+  /* ===== TYPOGRAPHY ===== */
+  
+  /* Font Families */
+  --font-family-body: 'Inter', 'Noto Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-heading: 'Poppins', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --font-family-ipa: 'Noto Sans', 'Charis SIL', 'Inter', system-ui, sans-serif;
+  
+  /* Font Sizes (rem-based, 1rem = 14px base) */
+  --font-size-xs: 0.714rem;    /* 10px */
+  --font-size-sm: 0.786rem;    /* 11px */
+  --font-size-base: 0.857rem;  /* 12px */
+  --font-size-md: 0.929rem;    /* 13px */
+  --font-size-lg: 1rem;        /* 14px - base body */
+  --font-size-xl: 1.071rem;    /* 15px */
+  --font-size-2xl: 1.143rem;   /* 16px */
+  --font-size-3xl: 1.286rem;   /* 18px */
+  --font-size-4xl: 1.429rem;   /* 20px */
+  --font-size-5xl: 1.714rem;   /* 24px */
+  --font-size-6xl: 2rem;       /* 28px */
+  --font-size-7xl: 2.286rem;   /* 32px */
+  --font-size-8xl: 2.857rem;   /* 40px */
+  
+  /* Font Weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+  --font-weight-black: 900;
+  
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-snug: 1.35;
+  --line-height-base: 1.5;
+  --line-height-relaxed: 1.65;
+  --line-height-loose: 1.8;
+  
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.02em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+  
+  /* ===== SPACING ===== */
+  --space-1: 0.25rem;  /* 4px */
+  --space-2: 0.5rem;   /* 8px */
+  --space-3: 0.75rem;  /* 12px */
+  --space-4: 1rem;     /* 16px */
+  --space-5: 1.25rem;  /* 20px */
+  --space-6: 1.5rem;   /* 24px */
+  --space-8: 2rem;     /* 32px */
+  --space-10: 2.5rem;  /* 40px */
+  --space-12: 3rem;    /* 48px */
+  --space-16: 4rem;    /* 64px */
+  --space-20: 5rem;    /* 80px */
+  
+  /* ===== BORDER RADIUS ===== */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+  
+  /* ===== SHADOWS ===== */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.05);
+  --shadow-2xl: 0 25px 60px rgba(0, 0, 0, 0.12), 0 12px 24px rgba(0, 0, 0, 0.06);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+  
+  /* Shadow with primary color */
+  --shadow-primary-sm: 0 1px 3px rgba(124, 58, 237, 0.15);
+  --shadow-primary-md: 0 4px 12px rgba(124, 58, 237, 0.2);
+  --shadow-primary-lg: 0 10px 24px rgba(124, 58, 237, 0.25);
+  
+  /* ===== TRANSITIONS ===== */
+  --transition-fast: 120ms ease;
+  --transition-base: 180ms ease;
+  --transition-slow: 250ms ease;
+  --transition-slower: 350ms ease;
+  --transition-bounce: 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ===== Z-INDEX ===== */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  
+  /* ===== BREAKPOINTS (for reference in media queries) ===== */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 992px;
+  --bp-xl: 1200px;
+  --bp-2xl: 1440px;
+  
+  /* ===== COMPONENT SPECIFIC ===== */
+  
+  /* Navbar */
+  --navbar-height: 60px;
+  --navbar-height-mobile: 56px;
+  
+  /* Sidebar */
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+  
+  /* Cards */
+  --card-border-width: 1.5px;
+  --card-border-color: var(--color-border-light);
+  --card-bg: var(--color-bg-primary);
+  
+  /* Buttons */
+  --btn-height-sm: 32px;
+  --btn-height-md: 40px;
+  --btn-height-lg: 48px;
+  --btn-padding-sm: 0 12px;
+  --btn-padding-md: 0 20px;
+  --btn-padding-lg: 0 28px;
+  
+  /* Inputs */
+  --input-height: 40px;
+  --input-height-sm: 32px;
+  --input-padding: 0 14px;
+  --input-border-color: var(--color-border-light);
+  --input-border-color-focus: var(--color-primary);
+  --input-bg: var(--color-bg-primary);
+  
+  /* Badge */
+  --badge-font-size: 0.714rem;  /* 10px */
+  --badge-padding: 3px 10px;
+  --badge-radius: var(--radius-full);
+  
+  /* Modal */
+  --modal-max-width: 560px;
+  --modal-max-width-lg: 720px;
+  --modal-max-width-xl: 960px;
+  
+  /* Progress Bar */
+  --progress-height: 6px;
+  --progress-radius: var(--radius-full);
+  
+  /* Tooltip */
+  --tooltip-max-width: 280px;
+  --tooltip-bg: var(--color-text-primary);
+  --tooltip-text-color: var(--color-text-inverse);
+}
+
+/* ========================================
+   DARK MODE SUPPORT (Future-ready)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: #f3f4f6;
+    --color-text-secondary: #9ca3af;
+    --color-text-tertiary: #6b7280;
+    --color-bg-primary: #111827;
+    --color-bg-secondary: #1f2937;
+    --color-bg-tertiary: #374151;
+    --color-border-light: #374151;
+    --color-border-medium: #4b5563;
+    --color-primary-light: #312e81;
+    --color-secondary-bg: #451a03;
+    --color-success-bg: #064e3b;
+    --color-error-bg: #7f1d1d;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast: 0ms;
+    --transition-base: 0ms;
+    --transition-slow: 0ms;
+    --transition-slower: 0ms;
+    --transition-bounce: 0ms;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+@media print {
+  :root {
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}

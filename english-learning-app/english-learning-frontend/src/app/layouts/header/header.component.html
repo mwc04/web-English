@@ -1,0 +1,29 @@
+<nav class="navbar">
+  <div class="logo" (click)="goToHome()">TỰ HỌC ENGLISH</div>
+  <ul class="nav-links">
+    <li><a (click)="goToVocabulary()">Từ vựng</a></li>
+    <li><a (click)="goToGrammar()">Ngữ pháp</a></li>
+    <li><a (click)="goToListening()">Luyện nghe</a></li>
+    <li><a (click)="goToReading()">Luyện đọc</a></li>
+    <li><a (click)="goToSpeaking()">Luyện nói</a></li>
+    <li><a (click)="goToWriting()">Luyện viết</a></li>
+    <li><a (click)="goToExam()">Thi thử</a></li>
+  </ul>
+  <div class="nav-right">
+    <ng-container *ngIf="isLoggedIn; else loggedOut">
+      <div class="user-menu">
+        <span class="user-name">{{ user?.full_name || user?.username }}</span>
+        <div class="avatar" (click)="goToProfile()">{{ user?.full_name?.charAt(0) || user?.username?.charAt(0) || '👤' }}</div>
+        <div class="dropdown-menu">
+          <a (click)="goToProfile()">👤 Hồ sơ</a>
+          <a (click)="goToHistory()">📜 Lịch sử học</a>
+          <button class="btn-logout" (click)="logout()">Đăng xuất</button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #loggedOut>
+      <a class="btn-login" (click)="goToLogin()">Đăng nhập</a>
+      <!-- <a class="btn-register" routerLink="/register">Đăng ký</a> -->
+    </ng-template>
+  </div>
+</nav>

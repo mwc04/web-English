@@ -1,0 +1,91 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý Đề thi</h1>
+    <button class="btn-add" (click)="openAdd()"><i class="fa-solid fa-plus"></i> Thêm đề thi</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Tìm kiếm đề thi..." [(ngModel)]="searchQuery" (input)="applyFilter()" />
+  </div>
+
+  <table class="admin-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th>Tiêu đề</th>
+        <th>Danh mục</th>
+        <th>Loại</th>
+        <th>Số câu</th>
+        <th>Thời gian</th>
+        <th>Ngày tạo</th>
+        <th>Thao tác</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of filteredItems">
+        <td><strong>{{ item.title }}</strong></td>
+        <td><span class="badge badge-{{ item.category }}">{{ item.category }}</span></td>
+        <td>{{ item.type }}</td>
+        <td>{{ item.total_questions }}</td>
+        <td>{{ item.duration_minutes }} phút</td>
+        <td>{{ item.createdAt | date:'dd/MM/yyyy' }}</td>
+        <td class="actions">
+          <button class="btn-icon" (click)="openEdit(item)" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn-icon btn-danger" (click)="deleteItem(item._id)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredItems.length === 0">
+        <td colspan="7" class="text-center">Không có dữ liệu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ editItem ? 'Sửa đề thi' : 'Thêm đề thi' }}</h3>
+      <button class="modal-close" (click)="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Tiêu đề</label>
+        <input type="text" [(ngModel)]="formData.title" placeholder="VD: TOEIC Full Test #3" />
+      </div>
+      <div class="form-group">
+        <label>Mô tả</label>
+        <textarea [(ngModel)]="formData.description" placeholder="Mô tả ngắn về đề thi..." rows="2"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Danh mục</label>
+          <select [(ngModel)]="formData.category">
+            <option *ngFor="let c of categories" [value]="c.key">{{ c.label }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Loại</label>
+          <select [(ngModel)]="formData.type">
+            <option *ngFor="let t of testTypes" [value]="t.key">{{ t.label }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Số câu hỏi</label>
+          <input type="number" [(ngModel)]="formData.total_questions" min="1" />
+        </div>
+        <div class="form-group">
+          <label>Thời gian (phút)</label>
+          <input type="number" [(ngModel)]="formData.duration_minutes" min="1" />
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="closeModal()">Hủy</button>
+      <button class="btn-save" (click)="save()">{{ editItem ? 'Cập nhật' : 'Thêm mới' }}</button>
+    </div>
+  </div>
+</div>

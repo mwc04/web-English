@@ -1,0 +1,37 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý Người dùng</h1>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Tìm kiếm người dùng..." [(ngModel)]="searchQuery" (input)="applyFilter()" />
+  </div>
+
+  <table class="admin-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Trình độ</th>
+        <th>Ngày tạo</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of filteredItems">
+        <td>{{ item.username }}</td>
+        <td>{{ item.email }}</td>
+        <td>{{ item.level || '—' }}</td>
+        <td>{{ item.createdAt | date:'dd/MM/yyyy' }}</td>
+        <td class="actions">
+          <button class="btn-icon delete" (click)="deleteItem(item._id)" title="Xóa">🗑️</button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredItems.length === 0">
+        <td colspan="5" class="text-center">Không có dữ liệu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+</div>

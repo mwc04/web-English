@@ -1,0 +1,22 @@
+<div class="detail-container" *ngIf="!loading && item">
+  <button class="back-btn" (click)="back()">← Quay lại</button>
+
+  <div class="detail-card">
+    <h1>{{ item.title }}</h1>
+    <p class="subtitle" *ngIf="item.subtitle">{{ item.subtitle }}</p>
+
+    <div class="level-badge" *ngIf="item.level">{{ item.level }}</div>
+
+    <div class="audio-player" *ngIf="audioUrl">
+      <audio controls [src]="audioUrl" style="width:100%"></audio>
+    </div>
+
+    <div class="transcript-section" *ngIf="item.transcript">
+      <h3>Transcript</h3>
+      <p>{{ item.transcript }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="loading" *ngIf="loading">Đang tải...</div>
+<div class="loading" *ngIf="!loading && !item">Không tìm thấy bài nghe</div>

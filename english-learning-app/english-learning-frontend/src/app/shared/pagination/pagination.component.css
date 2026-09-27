@@ -1,0 +1,63 @@
+/* ========================================
+   SHARED PAGINATION - VIOLET DESIGN SYSTEM
+   ======================================== */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  width: 36px;
+  height: 36px;
+  border: var(--card-border-width) solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.page-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+.page-btn:disabled {
+  opacity: var(--disabled-opacity);
+  cursor: not-allowed;
+}
+
+.page-btn.page-ellipsis {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text-tertiary);
+  cursor: default;
+}
+
+.page-btn.page-ellipsis:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text-tertiary);
+}
+
+/* Size variants */
+.pagination-sm .page-btn { width: 28px; height: 28px; font-size: var(--font-size-sm); }
+.pagination-lg .page-btn { width: 44px; height: 44px; font-size: var(--font-size-lg); }

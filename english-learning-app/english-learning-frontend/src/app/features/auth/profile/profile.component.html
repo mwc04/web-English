@@ -1,0 +1,285 @@
+<div class="page">
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <span class="hero-tag">✦ • TIẾN ĐỘ HỌC TẬP CỦA BẠN</span>
+
+    <h1 class="hero-title">
+      TIẾN ĐỘ <span class="highlight">HỌC TẬP</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Theo dõi hành trình chinh phục tiếng Anh của bạn – từ từ vựng, ngữ pháp đến luyện nghe, nói, đọc, viết
+    </p>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Tìm kiếm bài học, chủ đề (ví dụ: Thì hiện tại, Từ vựng du lịch)"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+      />
+      <button class="search-btn">Tìm</button>
+    </div>
+
+    <div class="filter-tabs">
+      <span class="filter-label">Phổ biến:</span>
+      <button
+        *ngFor="let tab of filterTabs.slice(1)"
+        class="filter-tab"
+        [class.active]="activeTab === tab"
+        (click)="setTab(tab)"
+      >
+        {{ tab }}
+      </button>
+    </div>
+  </section>
+
+  <!-- PROGRESS CARD -->
+  <section class="progress-card">
+    <div class="progress-icon">📈</div>
+    <div class="progress-info">
+      <div class="progress-title">Tiến độ học tập tổng quan</div>
+      <div class="progress-subtitle">
+        Bạn đã hoàn thành {{ completedTopics }} trên tổng số
+        {{ totalTopics }} bài học ở mọi kỹ năng
+      </div>
+    </div>
+    <div class="progress-stats">
+      <div class="progress-percent">
+        Hoàn thành {{ progressPercent }}%
+        <span class="progress-count">{{ completedTopics }}/{{ totalTopics }} bài học</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    </div>
+  </section>
+
+<!-- ACTIVITY CHART SECTION -->
+  <section class="activity-chart-section" *ngIf="activityChartData.length > 0">
+    <div class="chart-header">
+      <div class="chart-header-left">
+        <div class="chart-icon-wrapper">
+          <span class="chart-icon">📊</span>
+        </div>
+        <div class="chart-title-group">
+          <h2 class="chart-title">Hoạt động 7 ngày gần đây</h2>
+          <p class="chart-subtitle">
+            Tổng cộng <strong>{{ weeklyTotalMinutes }} phút</strong> | 
+            Chuỗi ngày: <strong>{{ streakDays }} ngày</strong> | 
+            Trung bình <strong>{{ avgDailyMinutes }} phút/ngày</strong>
+          </p>
+        </div>
+      </div>
+      <div class="chart-header-right">
+        <div class="stat-pill">
+          <span class="pill-value">{{ todayMinutes }}</span>
+          <span class="pill-label">Hôm nay</span>
+        </div>
+        <div class="stat-pill">
+          <span class="pill-value">{{ weeklyTotalMinutes }}</span>
+          <span class="pill-label">Tuần này</span>
+        </div>
+        <div class="stat-pill">
+          <span class="pill-value">{{ streakDays }}</span>
+          <span class="pill-label">Ngày liên tiếp</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="activity-chart-wrapper">
+      <div class="chart-y-axis">
+        <span class="y-label" *ngFor="let tick of yAxisTicks">{{ tick }}m</span>
+      </div>
+      <div class="chart-area">
+        <div class="chart-grid">
+          <div class="grid-line" *ngFor="let tick of yAxisTicks"></div>
+        </div>
+        <div class="chart-bars">
+          <div class="chart-bar" 
+               *ngFor="let day of activityChartData; let i = index" 
+               [style.height.%]="day.percent"
+               [class.today]="day.isToday"
+               [class.future]="day.isFuture"
+               (mouseenter)="hoveredDay = i"
+               (mouseleave)="hoveredDay = -1">
+            <div class="bar-tooltip" *ngIf="hoveredDay === i">
+              <span class="tooltip-value">{{ day.minutes }} phút</span>
+              <span class="tooltip-label">{{ day.label }}</span>
+            </div>
+            <div class="bar-fill" 
+                 [style.height.%]="day.percent"
+                 [style.background]="day.isToday ? 'linear-gradient(180deg, #7c3aed 0%, #a855f7 100%)' : day.isFuture ? 'linear-gradient(180deg, #d1d5db 0%, #9ca3af 100%)' : 'linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)'">
+            </div>
+            <span class="bar-value" *ngIf="hoveredDay === i || day.minutes > 0">{{ day.minutes }}m</span>
+            <span class="bar-label">{{ day.label }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-x-axis">
+        <span class="x-label" *ngFor="let day of activityChartData" [class.today]="day.isToday">{{ day.label }}</span>
+      </div>
+    </div>
+
+    <div class="chart-summary-row">
+      <div class="summary-card" *ngFor="let stat of summaryStats">
+        <div class="summary-icon" [style.background]="stat.bg">
+          <span class="summary-icon-emoji">{{ stat.icon }}</span>
+        </div>
+        <div class="summary-content">
+          <span class="summary-value">{{ stat.value }}</span>
+          <span class="summary-label">{{ stat.label }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPICS / LESSONS SECTION -->
+  <section class="topics-section">
+    <div class="topics-header">
+      <h2 class="topics-title">
+        BÀI HỌC GẦN ĐÂY <span class="topics-count">{{ filteredLessons.length }} bài học</span>
+      </h2>
+      <div class="topics-filters">
+        <select class="dropdown" [(ngModel)]="selectedSkill" (change)="onFilter()">
+          <option value="">Tất cả kỹ năng</option>
+          <option value="vocabulary">📝 Từ vựng</option>
+          <option value="grammar">📚 Ngữ pháp</option>
+          <option value="listening">🎧 Luyện nghe</option>
+          <option value="reading">📖 Luyện đọc</option>
+          <option value="speaking">🗣️ Luyện nói</option>
+          <option value="writing">✍️ Luyện viết</option>
+        </select>
+        <select class="dropdown" [(ngModel)]="selectedStatus" (change)="onFilter()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="completed">✅ Đã hoàn thành</option>
+          <option value="in-progress">🔄 Đang học</option>
+          <option value="not-started">⏳ Chưa bắt đầu</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" *ngIf="loading">Đang tải...</div>
+
+    <!-- LESSONS GRID -->
+    <div class="topics-grid" *ngIf="!loading">
+      <div
+        class="topic-card"
+        *ngFor="let topic of filteredLessons; trackBy: trackById"
+        [style.border-color]="topic.borderColor"
+        [class.completed]="topic.status === 'completed'"
+        [class.in-progress]="topic.status === 'in-progress'"
+      >
+        <div class="topic-category" [style.color]="topic.borderColor">
+          <span class="category-icon">{{ topic.icon }}</span>{{ topic.skill }}
+        </div>
+
+        <span class="badge" [ngClass]="levelClass(topic.level)">{{ topic.level }}</span>
+
+        <h3 class="topic-title">{{ topic.title }}</h3>
+        <p class="topic-desc">{{ topic.description }}</p>
+
+        <div class="topic-meta">
+          <span>{{ topic.lessons }} bài</span>
+          <span>⏱ {{ topic.minutes }} phút</span>
+        </div>
+
+        <div class="topic-footer">
+          <span class="badge" [ngClass]="statusClass(topic.status)">{{ getStatusLabel(topic.status) }}</span>
+          <a class="topic-link" (click)="goToLesson(topic.id)">Học ngay ›</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state" *ngIf="!loading && filteredLessons.length === 0">
+      <div class="empty-icon">📚</div>
+      <h3>Chưa có bài học nào</h3>
+      <p>Hãy bắt đầu học để thấy tiến độ của bạn ở đây!</p>
+      <button class="btn-primary" (click)="goToHome()">Khám phá bài học ngay</button>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-row" *ngIf="!loading && filteredLessons.length > 0">
+      <span class="pagination-info">Hiển thị 1 - {{ filteredLessons.length }} của {{ totalTopics }} bài học</span>
+      <div class="pagination">
+        <button class="page-arrow" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+        <button
+          class="page-btn"
+          *ngFor="let p of [1,2,3]"
+          [class.active]="currentPage === p"
+          (click)="goToPage(p)"
+        >
+          {{ p }}
+        </button>
+        <span class="page-dots" *ngIf="totalPages > 3">…</span>
+        <button
+          class="page-btn"
+          *ngIf="totalPages > 3"
+          [class.active]="currentPage === totalPages"
+          (click)="goToPage(totalPages)"
+        >
+          {{ totalPages }}
+        </button>
+        <button class="page-arrow" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS BREAKDOWN SECTION -->
+  <section class="topics-section">
+    <div class="topics-header">
+      <h2 class="topics-title">
+        PHÂN TÍCH THEO KỸ NĂNG
+      </h2>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-item" *ngFor="let skill of skillsBreakdown">
+        <div class="stat-header">
+          <div class="stat-icon" [style.background]="skill.bgColor">
+            {{ skill.icon }}
+          </div>
+          <div class="stat-info">
+            <div class="stat-value">{{ skill.completed }}/{{ skill.total }}</div>
+            <div class="stat-label">{{ skill.name }}</div>
+          </div>
+        </div>
+        <div class="stat-progress">
+          <div class="progress-bar-track" style="height: 8px;">
+            <div class="progress-bar-fill" [style.width.%]="skill.percent" [style.background]="skill.gradient"></div>
+          </div>
+          <span class="progress-percent-small">{{ skill.percent }}%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACHIEVEMENTS SECTION -->
+  <!-- <section class="topics-section">
+    <div class="topics-header">
+      <h2 class="topics-title">
+        THÀNH TỰU CỦA BẠN
+      </h2>
+    </div>
+
+    <div class="achievements-grid">
+      <div class="achievement-card" *ngFor="let achievement of achievements" [class.unlocked]="achievement.unlocked">
+        <div class="achievement-icon" [style.background]="achievement.bgColor">
+          {{ achievement.icon }}
+        </div>
+        <div class="achievement-info">
+          <h4 class="achievement-title">{{ achievement.title }}</h4>
+          <p class="achievement-desc">{{ achievement.description }}</p>
+        </div>
+        <div class="achievement-badge" [class.earned]="achievement.unlocked">
+          <span class="badge-earned" *ngIf="achievement.unlocked">✅ Đã đạt</span>
+          <span class="badge-locked" *ngIf="!achievement.unlocked">{{ achievement.progress }}/{{ achievement.target }}</span>
+        </div>
+      </div>
+    </div>
+  </section> -->
+</div>

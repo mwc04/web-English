@@ -1,0 +1,186 @@
+<!-- Loading -->
+<div class="loading" *ngIf="loading">Đang tải...</div>
+
+<!-- Error -->
+<div class="error-state" *ngIf="!loading && error">
+  <p>{{ error }}</p>
+  <button class="back-link" (click)="goBack()">← Quay lại danh sách</button>
+</div>
+
+<ng-container *ngIf="!loading && rule">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="back-btn" (click)="goBack()" title="Quay lại">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div>
+        <div class="lesson-title">{{ rule.rule_name }}</div>
+        <div class="lesson-sub">
+          <span class="badge-sm category-badge">{{ catMeta[rule.category].icon }} {{ catMeta[rule.category].label || rule.category }}</span>
+          <span class="badge-sm" [ngClass]="levelClass">{{ levelLabel }}</span>
+          <span class="badge-sm" [ngClass]="diffClass">{{ diffLabel }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="streak">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"/></svg>
+      5
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'ly-thuyet'" (click)="switchTab('ly-thuyet')">
+      <span class="tab-num">1</span>Lý thuyết
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'bai-tap'" (click)="switchTab('bai-tap')">
+      <span class="tab-num">2</span>Bài tập
+    </button>
+  </div>
+
+  <!-- LÝ THUYẾT PANEL -->
+  <div class="tab-panel" [class.active]="activeTab === 'ly-thuyet'">
+    <div class="content">
+
+      <!-- Card: Định nghĩa -->
+      <div class="card" *ngIf="defSection">
+        <div class="card-header">
+          <div class="card-icon blue">{{ defSection.icon || '📘' }}</div>
+          <div>
+            <div class="card-title">{{ defSection.title || 'Định nghĩa' }}</div>
+            <div class="card-sub">{{ defSection.subtitle || 'Khái niệm cơ bản' }}</div>
+          </div>
+        </div>
+        <div class="def-box">
+          <div class="def-label">{{ defSection.label || 'Định nghĩa' }}</div>
+          <div class="def-text" [innerHTML]="defSection.text"></div>
+        </div>
+        <div class="examples-label">Ví dụ trong câu:</div>
+        <div class="example-row" *ngFor="let item of exampleItems">
+          <div class="check-icon">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+          </div>
+          <div class="example-text" [innerHTML]="item.text"></div>
+        </div>
+      </div>
+
+      <!-- Card: Cấu trúc (nếu có) -->
+      <div class="card" *ngIf="structSection">
+        <div class="card-header">
+          <div class="card-icon blue">📋</div>
+          <div>
+            <div class="card-title">{{ structSection.title || 'Cấu trúc' }}</div>
+            <div class="card-sub">Công thức ngữ pháp</div>
+          </div>
+        </div>
+        <div class="structure-box">
+          <code>{{ structSection.structure }}</code>
+        </div>
+        <div class="structure-note" *ngIf="structSection.notes" [innerHTML]="structSection.notes"></div>
+      </div>
+
+      <!-- Card: Phân loại (nếu có) -->
+      <div class="card" *ngIf="classifySection">
+        <div class="card-header">
+          <div class="card-icon purple">⊞</div>
+          <div>
+            <div class="card-title">{{ classifySection.title }}</div>
+            <div class="card-sub">{{ classifySection.subtitle }}</div>
+          </div>
+        </div>
+        <div class="classify-grid">
+          <div class="classify-box countable" *ngIf="classifySection.countable">
+            <div class="classify-label green">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              Đếm được
+            </div>
+            <div class="classify-item" *ngFor="let item of classifySection.countable">{{ item }}</div>
+          </div>
+          <div class="classify-box uncountable" *ngIf="classifySection.uncountable">
+            <div class="classify-label orange">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+              Không đếm được
+            </div>
+            <div class="classify-item" *ngFor="let item of classifySection.uncountable">{{ item }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Quy tắc quan trọng -->
+      <div class="card" *ngIf="rulesSection">
+        <div class="card-header">
+          <div class="card-icon blue">📋</div>
+          <div>
+            <div class="card-title">{{ rulesSection.title || 'Quy tắc quan trọng' }}</div>
+            <div class="card-sub">Cần ghi nhớ</div>
+          </div>
+        </div>
+        <div class="rules-list">
+          <div class="rule-row" *ngFor="let item of rulesSection.items">
+            <div class="rule-num">{{ item.num }}</div>
+            <div class="rule-text" [innerHTML]="item.text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Lỗi thường gặp -->
+      <div class="card" *ngIf="errorsSection">
+        <div class="card-header">
+          <div class="card-icon red-soft">⚠️</div>
+          <div>
+            <div class="card-title">{{ errorsSection.title || 'Lỗi thường gặp' }}</div>
+            <div class="card-sub">Tránh những sai lầm này</div>
+          </div>
+        </div>
+        <div class="errors-list">
+          <div class="error-row" *ngFor="let item of errorsSection.items">
+            <div class="error-icon">
+              <svg width="18" height="18" viewBox="0 0 20 20" [attr.fill]="item.ok ? '#22c55e' : '#ef4444'">
+                <ng-container *ngIf="!item.ok">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </ng-container>
+                <ng-container *ngIf="item.ok">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                </ng-container>
+              </svg>
+            </div>
+            <div class="error-text" [innerHTML]="item.text"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Các section type khác (nếu có) -->
+      <div class="card" *ngFor="let section of otherSections">
+        <div class="card-header">
+          <div class="card-icon blue">📄</div>
+          <div>
+            <div class="card-title">{{ section.title }}</div>
+          </div>
+        </div>
+        <div class="def-box">
+          <div class="def-text" [innerHTML]="section.text"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-wrap" *ngIf="sections.length > 0">
+      <button class="cta-btn" (click)="switchTab('bai-tap')">
+        ✏️ Bắt đầu làm bài tập →
+      </button>
+      <div class="cta-sub">5 câu · khoảng 3 phút</div>
+    </div>
+  </div>
+
+  <!-- BÀI TẬP PANEL -->
+  <div class="tab-panel" [class.active]="activeTab === 'bai-tap'">
+    <div class="content">
+      <div class="exercise-placeholder">
+        <div class="big-icon">✏️</div>
+        <p>Hoàn thành phần <strong>Lý thuyết</strong> để mở khoá bài tập!</p>
+      </div>
+    </div>
+  </div>
+</ng-container>

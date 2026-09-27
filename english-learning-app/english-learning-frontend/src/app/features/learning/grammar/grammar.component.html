@@ -1,0 +1,149 @@
+<!-- NAVBAR -->
+<!-- <nav class="navbar">
+  <div class="logo">TỰ HỌC ENGLISH</div>
+  <ul class="nav-links">
+    <li><a [class.active]="false">Từ vựng</a></li>
+    <li><a [class.active]="true">Ngữ pháp</a></li>
+    <li><a>Luyện nghe</a></li>
+    <li><a>Luyện đọc</a></li>
+    <li><a>Luyện nói</a></li>
+    <li><a>Luyện viết</a></li>
+    <li><a>Thi thử</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-icon-btn">🔔</button>
+    <div class="avatar">👤</div>
+  </div>
+</nav> -->
+
+<!-- MAIN CONTENT -->
+<div class="page">
+  <!-- HERO SECTION -->
+  <section class="hero">
+    <span class="hero-tag">✦ • NỀN TẢNG NGỮ PHÁP TOÀN DIỆN</span>
+
+    <h1 class="hero-title">
+      CHINH PHỤC <span class="highlight">NGỮ PHÁP TIẾNG ANH</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      Hệ thống ngữ pháp đầy đủ từ cơ bản đến nâng cao – xây dựng nền tảng ngữ
+      pháp vững chắc để tự tin giao tiếp và bứt phá điểm số thi cử.
+    </p>
+
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Tìm kiếm chủ đề ngữ pháp (ví dụ: Thì hiện tại đơn, câu bị động)"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+      />
+      <button class="search-btn">Tìm</button>
+    </div>
+
+    <div class="filter-tabs">
+      <span class="filter-label">Phổ biến:</span>
+      <button
+        *ngFor="let tab of filterTabs.slice(1)"
+        class="filter-tab"
+        [class.active]="activeTab === tab"
+        (click)="setTab(tab)"
+      >
+        {{ tab }}
+      </button>
+    </div>
+  </section>
+
+  <!-- PROGRESS CARD -->
+  <section class="progress-card">
+    <div class="progress-icon">↻</div>
+    <div class="progress-info">
+      <div class="progress-title">Tiến độ ôn tập ngữ pháp của bạn</div>
+      <div class="progress-subtitle">
+        Bạn đã hoàn thành {{ completedTopics }} trên tổng số
+        {{ totalTopics }} chủ đề ở cả cơ bản & nâng cao
+      </div>
+    </div>
+    <div class="progress-stats">
+      <div class="progress-percent">
+        Hoàn thành {{ progressPercent }}%
+        <span class="progress-count">{{ completedTopics }}/{{ totalTopics }} chủ đề</span>
+      </div>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width.%]="progressPercent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOPICS SECTION -->
+  <section class="topics-section">
+    <div class="topics-header">
+      <h2 class="topics-title">
+        CÁC CHỦ ĐỀ NGỮ PHÁP <span class="topics-count">{{ totalTopics }} chủ đề</span>
+      </h2>
+      <div class="topics-filters">
+        <select class="dropdown">
+          <option>Tất cả chủ đề</option>
+        </select>
+        <select class="dropdown">
+          <option>Tất cả cấp độ</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="topics-grid">
+      <div
+        class="topic-card"
+        *ngFor="let topic of topics; trackBy: trackById"
+        [style.border-color]="topic.borderColor"
+        (click)="goToLesson(topic.id)"
+      >
+        <div class="topic-category" [style.color]="topic.borderColor">
+          <span class="category-icon">🕐</span>{{ topic.category }}
+        </div>
+
+        <span class="badge" [ngClass]="levelClass(topic.level)">{{ topic.level }}</span>
+
+        <h3 class="topic-title">{{ topic.title }}</h3>
+        <p class="topic-desc">{{ topic.description }}</p>
+
+        <div class="topic-meta">
+          <span>📖 1 bài học</span>
+          <span>⏱ {{ topic.minutes }} phút</span>
+        </div>
+
+        <div class="topic-footer">
+          <span class="badge" [ngClass]="levelClass(topic.level)">{{ topic.level }}</span>
+          <a class="topic-link">Học ngay ›</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination-row">
+      <span class="pagination-info">Hiển thị 1 - {{ topics.length }} của {{ totalTopics }} chủ đề ngữ pháp</span>
+      <div class="pagination">
+        <button class="page-arrow" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">‹</button>
+        <button
+          class="page-btn"
+          *ngFor="let p of [1,2,3]"
+          [class.active]="currentPage === p"
+          (click)="goToPage(p)"
+        >
+          {{ p }}
+        </button>
+        <span class="page-dots" *ngIf="totalPages > 3">…</span>
+        <button
+          class="page-btn"
+          *ngIf="totalPages > 3"
+          [class.active]="currentPage === totalPages"
+          (click)="goToPage(totalPages)"
+        >
+          {{ totalPages }}
+        </button>
+        <button class="page-arrow" (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">›</button>
+      </div>
+    </div>
+  </section>
+</div>

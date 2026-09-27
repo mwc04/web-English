@@ -1,0 +1,88 @@
+<div class="detail-page">
+
+  <!-- Header -->
+  <div class="detail-header">
+    <button class="back-btn" (click)="goBack()">← Quay lại</button>
+    <div class="header-info">
+      <span class="header-topic">{{ topicTitle }}</span>
+      <span class="header-count">{{ studiedWords }}/{{ totalWords }} từ</span>
+    </div>
+  </div>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+
+  <!-- Main card area -->
+  <div class="card-area" *ngIf="!loading && !isFinished && cards.length > 0; else finishedBlock">
+
+    <!-- Progress bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress"></div>
+      <span class="progress-text">{{ progress }}% ({{ learnedWords }}/{{ totalWords }} đã nhớ)</span>
+    </div>
+
+    <!-- Flashcard -->
+    <div class="flashcard-wrapper" (click)="flipCard()">
+      <div class="flashcard" [class.flipped]="isFlipped">
+        <div class="card-face card-front">
+          <p class="card-word">{{ currentCard?.word }}</p>
+          <p class="card-pronunciation" *ngIf="currentCard?.pronunciation">{{ currentCard?.pronunciation }}</p>
+          <p class="card-tap-hint">Nhấn để lật thẻ</p>
+        </div>
+        <div class="card-face card-back">
+          <p class="card-meaning">{{ currentCard?.meaning }}</p>
+          <div class="card-example-box" *ngIf="currentCard?.example">
+            <p class="card-example-en">"{{ currentCard?.example }}"</p>
+          </div>
+          <p class="card-tap-hint">Nhấn để lật lại</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-row">
+      <button class="btn btn-forgot" (click)="markForgotten()">Chưa nhớ</button>
+      <button class="btn btn-remembered" (click)="markRemembered()">Nhớ rồi</button>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-row">
+      <button class="nav-btn" (click)="goToPrev()" [disabled]="currentIndex === 0">← Trước</button>
+      <span class="nav-index">Thẻ {{ currentIndex + 1 }} / {{ totalWords }}</span>
+      <button class="nav-btn" (click)="nextCard()" [disabled]="isFinished">Sau →</button>
+    </div>
+
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && cards.length === 0">
+    <p>Không có từ vựng nào trong danh mục này.</p>
+    <button class="btn btn-primary" (click)="goBack()">Về danh sách</button>
+  </div>
+
+  <!-- Finished state -->
+  <ng-template #finishedBlock>
+    <div class="finished-area" *ngIf="!loading">
+      <div class="finished-icon">🎉</div>
+      <h2>Hoàn thành!</h2>
+      <p>Bạn đã học xong bộ thẻ <strong>{{ topicTitle }}</strong></p>
+      <div class="finished-stats">
+        <div class="stat-item">
+          <span class="stat-num">{{ learnedWords }}</span>
+          <span class="stat-label">Từ đã nhớ</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">{{ totalWords - learnedWords }}</span>
+          <span class="stat-label">Cần ôn lại</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num">{{ progress }}%</span>
+          <span class="stat-label">Tỉ lệ nhớ</span>
+        </div>
+      </div>
+      <div class="finished-actions">
+        <button class="btn btn-primary" (click)="reset()">Học lại</button>
+        <button class="btn btn-secondary" (click)="goBack()">Về danh sách</button>
+      </div>
+    </div>
+  </ng-template>
+
+</div>

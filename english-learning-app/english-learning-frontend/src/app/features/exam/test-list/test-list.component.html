@@ -1,0 +1,484 @@
+<!-- OVERLAY -->
+<div class="overlay" [class.open]="modalOpen" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-head">
+      <div><h3>Chọn chế độ <small>{{ currentExam?.title || 'Test' }}</small></h3></div>
+      <button class="modal-close" (click)="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab" [class.active]="modalTab==='exam'" (click)="setModalTab('exam')">
+        <i class="fa-regular fa-file-lines"></i> Luyện thi
+      </button>
+      <button class="modal-tab" [class.active]="modalTab==='practice'" (click)="setModalTab('practice')">
+        <i class="fa-solid fa-dumbbell"></i> Luyện tập
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="mode-card" [class.selected]="selectedMode==='full'" (click)="selectMode('full')">
+        <div class="mode-card-head">
+          <div>
+            <div class="mode-icon blue"><i class="fa-regular fa-file-lines"></i></div>
+            <div class="mode-title">Full Test (200 câu)</div>
+            <div class="mode-desc">Làm đầy đủ đề thi như thi thật - 2 tiếng</div>
+          </div>
+          <button class="btn-start" (click)="startExam($event,'listening')"><i class="fa-solid fa-play"></i> Bắt đầu</button>
+        </div>
+        <div class="mode-tags">
+          <span class="mode-tag"><i class="fa-regular fa-clock"></i> 120 phút</span>
+          <span class="mode-tag"><i class="fa-solid fa-list"></i> 200 câu</span>
+        </div>
+      </div>
+      <div class="mode-card" [class.selected]="selectedMode==='part'" (click)="selectMode('part')">
+        <div class="mode-card-head">
+          <div>
+            <div class="mode-icon green"><i class="fa-solid fa-circle-dot"></i></div>
+            <div class="mode-title">Thi theo Part</div>
+            <div class="mode-desc">Chọn Part cụ thể để thi thử</div>
+          </div>
+          <button class="btn-start" style="background:#00b894" (click)="startExam($event,'reading')"><i class="fa-solid fa-play"></i> Bắt đầu</button>
+        </div>
+        <div class="part-selector" (click)="$event.stopPropagation()">
+          <div class="part-all" (click)="togglePartAll()">
+            <span class="part-name"><div class="radio-dot" [class.checked]="allPartsSelected"></div> Chọn tất cả 7 Part</span>
+            <span class="part-count">200 câu</span>
+          </div>
+          <div class="part-group-label">LISTENING</div>
+          <div class="parts-row">
+            <div class="part-row" *ngFor="let n of [1,2,3,4]" (click)="togglePart(n)">
+              <span class="part-name"><div class="radio-dot" [class.checked]="isPartSelected(n)"></div> Part {{ n }}</span>
+              <span class="part-count">{{ [6,25,39,30][n-1] }} câu</span>
+            </div>
+          </div>
+          <div class="part-group-label">READING</div>
+          <div class="parts-row">
+            <div class="part-row" *ngFor="let n of [5,6,7]" (click)="togglePart(n)">
+              <span class="part-name"><div class="radio-dot" [class.checked]="isPartSelected(n)"></div> Part {{ n }}</span>
+              <span class="part-count">{{ [30,16,54][n-5] }} câu</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== PAGE: LIST ====================== -->
+<div *ngIf="view==='list'">
+  <div class="hero">
+    <div class="hero-tabs">
+      <button class="hero-tab active"><i class="fa-solid fa-graduation-cap"></i> Học</button>
+      <button class="hero-tab"><i class="fa-solid fa-chart-line"></i> Tiến độ</button>
+    </div>
+    <h1>Chinh phục <span>Tiếng Anh</span></h1>
+    <p>Luyện đề với đề thi thật và chấm điểm tự động</p>
+  </div>
+
+  <div class="filter-row">
+    <span class="filter-badge"><i class="fa-regular fa-circle-xmark"></i> Chưa làm</span>
+  </div>
+
+  <div class="year-tabs">
+    <button class="year-tab" *ngFor="let c of categories"
+      [class.active]="activeCategory===c.key"
+      (click)="setCategory(c.key)">
+      <i [class]="c.icon"></i> {{ c.label }}
+    </button>
+  </div>
+
+  <div class="grid-wrap" *ngIf="!loading">
+    <div class="tests-grid">
+      <div class="test-card" *ngFor="let t of tests">
+        <div class="card-top">
+          <div class="card-title">{{ t.title }}</div>
+          <div class="card-actions">
+            <i class="fa-regular fa-bookmark" title="Lưu"></i>
+            <i class="fa-regular fa-clock" title="Lịch sử"></i>
+            <i class="fa-regular fa-comment" title="Bình luận"></i>
+            <i class="fa-regular fa-copy" title="Sao chép"></i>
+            <i class="fa-regular fa-square-check" title="Kết quả"></i>
+          </div>
+        </div>
+        <div class="card-meta">
+          <span><i class="fa-regular fa-file-lines"></i> {{ t.total_questions }} câu</span>
+          <span><i class="fa-regular fa-clock"></i> {{ t.duration_minutes }} phút</span>
+        </div>
+        <div class="card-desc">{{ t.description }}</div>
+        <div class="card-status">Chưa luyện tập</div>
+        <div class="card-btns">
+          <button class="btn-try" (click)="activeCategory==='thpt' ? startTHPTExam(t._id) : openModal(t._id)"><i class="fa-solid fa-play"></i> Thi thử</button>
+          <button class="btn-practice" (click)="activeCategory==='thpt' ? startTHPTExam(t._id) : openModal(t._id)"><i class="fa-solid fa-dumbbell"></i> Luyện tập</button>
+        </div>
+      </div>
+    </div>
+    <div class="empty-state" *ngIf="tests.length === 0">
+      <i class="fa-solid fa-box-open"></i>
+      <p>Chưa có đề thi nào cho danh mục này</p>
+    </div>
+  </div>
+  <div class="grid-wrap loading-wrap" *ngIf="loading">
+    <p><i class="fa-solid fa-spinner fa-spin"></i> Đang tải đề thi...</p>
+  </div>
+</div>
+
+<!-- ====================== PAGE: EXAM ====================== -->
+<div class="exam-page" *ngIf="view==='exam'" [class.open]="view==='exam'">
+  <div class="exam-nav">
+    <div class="exam-nav-left">
+      <button class="exam-back" (click)="exitExam()">
+        <i class="fa-solid fa-arrow-left"></i> Thoát
+      </button>
+      <div class="exam-logo">Đ</div>
+      <span class="exam-title">{{ currentExam?.title || 'Test' }} - Luyện tập</span>
+    </div>
+    <div class="exam-nav-tools">
+      <button class="tool-btn"><i class="fa-solid fa-language"></i> Song ngữ</button>
+      <button class="tool-btn"><i class="fa-regular fa-note-sticky"></i> Ghi chú <span class="tb-count">0/5</span></button>
+      <button class="tool-btn"><i class="fa-solid fa-highlighter"></i> Annotator <span class="tb-count">0/5</span></button>
+      <button class="tool-btn"><i class="fa-solid fa-pencil"></i> Điền Từ</button>
+      <button class="tool-btn"><i class="fa-solid fa-rotate"></i> Lật Từ</button>
+      <button class="tool-btn"><i class="fa-solid fa-volume-high"></i> Auto</button>
+      <button class="tool-btn gold"><i class="fa-solid fa-bolt"></i> 0</button>
+      <span class="q-counter" *ngIf="examType==='standard'">Câu {{ (currentQuestion.id || 1) }}/{{ totalQuestions }}</span>
+      <span class="q-counter" *ngIf="examType==='structured'">{{ thptAnsweredCount }}/{{ totalTHPTQuestions }}</span>
+      <button class="tool-btn green">{{ examType==='structured' ? thptAnsweredCount : answeredCount }}/{{ examType==='structured' ? totalTHPTQuestions : totalQuestions }}</button>
+      <span class="tool-btn timer">{{ formatTime(timeLeft) }}</span>
+      <button class="tool-btn" style="background:#00b894;border-color:#00b894;color:#fff;font-weight:700" *ngIf="examType==='structured'" (click)="askSubmit()">
+        <i class="fa-regular fa-paper-plane"></i> Nộp bài
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== STANDARD TOEIC EXAM ===== -->
+  <div class="exam-body" *ngIf="examType==='standard'">
+    <div class="exam-left" [style.flex]="leftRatio">
+      <div class="left-scroll">
+        <p class="exam-instruction">{{ currentQuestion.instruction }}</p>
+
+        <!-- Audio player -->
+        <div class="audio-player" *ngIf="currentQuestion.type==='listening_photo'">
+          <div class="audio-wave">
+            <button class="play-circle" (click)="togglePlay()">
+              <i class="fa-solid" [ngClass]="playing ? 'fa-pause' : 'fa-play'"></i>
+            </button>
+            <div class="wave-bars">
+              <div class="wave-bar" *ngFor="let h of waveHeights; let i = index"
+                [style.height.px]="h"
+                [class.played]="(i / waveHeights.length * 100) < audioProgress"
+                [class.active]="Math.floor(Math.abs((i / waveHeights.length * 100) - audioProgress)) < 2">
+              </div>
+            </div>
+            <span class="audio-time">00:02 / {{ currentQuestion.audio?.duration || '0:24' }}</span>
+          </div>
+          <div class="audio-controls">
+            <div class="audio-controls-left">
+              <span class="audio-ctrl"><i class="fa-solid fa-rotate-left"></i> 3s</span>
+              <span class="audio-ctrl"><i class="fa-solid fa-rotate-right"></i> 5s</span>
+            </div>
+            <span class="speed-label">1x</span>
+          </div>
+          <div class="shortcuts">
+            <span class="shortcut"><kbd>Ctrl</kbd> Phát/Dừng</span>
+            <span class="shortcut"><kbd>Shift</kbd> Tua lại 3s</span>
+            <span class="shortcut"><kbd>1-4</kbd> Chọn đáp án</span>
+          </div>
+        </div>
+
+        <!-- Image -->
+        <img class="exam-image" *ngIf="currentQuestion.image" [src]="currentQuestion.image" alt="Exam photo"/>
+
+        <!-- Reading passage -->
+        <div class="reading-passage" *ngIf="currentQuestion.passage">
+          {{ currentQuestion.passage }}
+        </div>
+      </div>
+    </div>
+
+    <div class="divider" (mousedown)="onDividerMouseDown($event)"></div>
+
+    <div class="exam-right" [style.flex]="1 - leftRatio">
+      <div class="question-panel">
+        <!-- Passage sub-questions -->
+        <ng-container *ngIf="currentQuestion.subQuestions?.length">
+          <div class="question-label">{{ currentQuestion.group }} <span class="q-group-badge">{{ currentQuestion.groupCount }}</span></div>
+          <div class="question-block" *ngFor="let sq of currentQuestion.subQuestions">
+            <div class="q-head">
+              <span class="q-num">{{ sq.id }}.</span>
+              <button class="star-btn" [class.active]="isFlagged(sq.id)" (click)="toggleFlag(sq.id)">
+                <i class="fa-regular" [ngClass]="isFlagged(sq.id) ? 'fa-star' : 'fa-star'"></i>
+              </button>
+            </div>
+            <div class="q-text">{{ sq.text }}</div>
+            <div class="q-options">
+              <div class="q-option" *ngFor="let opt of sq.options; let oi = index"
+                [class.selected]="isSubAnswerSelected(currentQuestion, sq, oi)"
+                [class.correct]="sq.correct===oi"
+                [class.wrong]="isSubAnswerWrong(currentQuestion, sq, oi)"
+                (click)="selectAnswer(sq.id, oi)">
+                <div class="radio"
+                  [class.checked]="isSubAnswerSelected(currentQuestion, sq, oi)"
+                  [class.correct-radio]="sq.correct===oi"
+                  [class.wrong-radio]="isSubAnswerWrong(currentQuestion, sq, oi)"></div>
+                <span class="opt-label">{{ opt }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Normal question -->
+        <ng-container *ngIf="!currentQuestion.subQuestions">
+          <div class="question-label">Question</div>
+          <div class="question-block">
+            <div class="q-head">
+              <span class="q-num">{{ currentQuestion.id }}.</span>
+              <button class="star-btn" [class.active]="isFlagged(currentQuestion.id || 0)" (click)="toggleFlag(currentQuestion.id || 0)">
+                <i class="fa-solid fa-star" [style.color]="isFlagged(currentQuestion.id || 0) ? '#ffb700' : '#ddd'"></i>
+              </button>
+            </div>
+            <div class="q-text" *ngIf="currentQuestion.question || currentQuestion.text">{{ currentQuestion.question || currentQuestion.text }}</div>
+            <div class="q-options">
+              <div class="q-option" *ngFor="let opt of currentQuestion.options; let oi = index"
+                [class.selected]="isAnswerSelected(currentQuestion.id || 0, oi)"
+                (click)="selectAnswer(currentQuestion.id || 0, oi)">
+                <div class="radio" [class.checked]="isAnswerSelected(currentQuestion.id || 0, oi)"></div>
+                <span class="opt-label">{{ opt }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Standard footer -->
+  <div class="exam-footer" *ngIf="examType==='standard'">
+    <div class="footer-left">
+      <button class="btn-report"><i class="fa-solid fa-triangle-exclamation"></i> Báo lỗi</button>
+      <button class="btn-wordbook"><i class="fa-solid fa-basket-shopping"></i> Giỏ từ</button>
+    </div>
+    <div class="footer-center">
+      <div class="timer-wrap" [class.warning]="timeLeft < 300" [class.danger]="timeLeft < 60">
+        <i class="fa-regular fa-clock"></i> {{ formatTime(timeLeft) }}
+      </div>
+    </div>
+    <div class="footer-nav">
+      <button class="nav-arrow" (click)="prevQ()"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="q-map-btn" (click)="submitExam()"><i class="fa-regular fa-circle-check"></i> Nộp bài</button>
+      <button class="nav-arrow" (click)="nextQ()"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  </div>
+
+  <!-- ===== THPT STRUCTURED EXAM ===== -->
+  <div class="thpt-layout" *ngIf="examType==='structured'">
+    <!-- SIDEBAR -->
+    <div class="thpt-sidebar">
+      <h2>Danh sách câu hỏi</h2>
+      <div class="thpt-sections-nav">
+        <ng-container *ngFor="let sec of examSections; let si = index">
+          <div class="thpt-section-label">{{ thptSectionLabels[si] && thptSectionLabels[si].label || 'Phần ' + (si+1) }}</div>
+          <div class="thpt-q-grid">
+            <button *ngFor="let q of sec.questions"
+              class="thpt-q-btn"
+              [class.answered]="thptAnswers[q.id] !== undefined"
+              [class.current]="activeQId === q.id"
+              [attr.data-num]="q.id"
+              (click)="scrollToTHPT(q.id)">
+              {{ q.id }}
+            </button>
+          </div>
+        </ng-container>
+      </div>
+      <div class="thpt-legend">
+        <div class="thpt-legend-row"><div class="thpt-legend-dot answered"></div><span>Đã trả lời</span></div>
+        <div class="thpt-legend-row"><div class="thpt-legend-dot unanswered"></div><span>Chưa trả lời</span></div>
+      </div>
+      <div class="thpt-progress-bar-wrap">
+        <div class="thpt-progress-bar-fill" id="thpt-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="thpt-progress-text" id="thpt-progress-text">0 / {{ totalTHPTQuestions }} câu đã trả lời</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="thpt-main">
+      <!-- Exam header -->
+      <div class="thpt-exam-header-card">
+        <div class="thpt-ministry">Bộ Giáo dục và Đào tạo &bull; Đề thi chính thức</div>
+        <h2>KỲ THI TỐT NGHIỆP TRUNG HỌC PHỔ THÔNG</h2>
+        <div class="thpt-subject">Môn thi: TIẾNG ANH</div>
+        <div class="thpt-meta">Thời gian làm bài: {{ currentExam?.duration_minutes }} phút, không kể thời gian phát đề</div>
+        <span class="thpt-code-badge">Mã đề: {{ currentExam?._id?.slice(-4) || '1101' }}</span>
+      </div>
+
+      <!-- Section cards -->
+      <div class="thpt-section-card" *ngFor="let sec of examSections; let si = index">
+        <div class="thpt-section-head">
+          <h3>Phần {{ si + 1 }} &ndash; {{ sectionTypeLabel(sec.type) }} (Câu {{ sec.questions?.[0]?.id }}&ndash;{{ sec.questions?.[sec.questions?.length - 1]?.id }})</h3>
+          <p>{{ sec.instruction }}</p>
+        </div>
+
+        <!-- Passage for fill_in_blank -->
+        <div class="thpt-passage-box" *ngIf="sec.type === 'fill_in_blank'">
+          <div class="thpt-passage-title" *ngIf="sec.title">{{ sec.title }}</div>
+          <div class="thpt-passage-text" [innerHTML]="renderPassageWithBlanks(sec)"></div>
+        </div>
+
+        <!-- Passage for reading comprehension -->
+        <div class="thpt-passage-box" *ngIf="sec.type === 'reading_comprehension'">
+          <div class="thpt-passage-text" style="white-space:pre-line">{{ sec.passage }}</div>
+          <div class="thpt-source" *ngIf="sec.source"><em>{{ sec.source }}</em></div>
+        </div>
+
+        <!-- Questions -->
+        <div class="thpt-question-block" *ngFor="let q of sec.questions"
+          [id]="'thpt-q-' + q.id"
+          [class.active]="activeQId === q.id">
+
+          <div class="thpt-question-num">Câu {{ q.id }}</div>
+          <div class="thpt-question-text">{{ q.text }}</div>
+
+          <!-- Sentence arrangement: show sentences -->
+          <div class="thpt-sentences-box" *ngIf="sec.type === 'sentence_arrangement' && q.sentences">
+            <div class="thpt-sentence-row" *ngFor="let sent of q.sentences">
+              <span class="thpt-sent-key">{{ sent.key }}.</span>
+              <span>{{ sent.text }}</span>
+            </div>
+          </div>
+
+          <!-- Options -->
+          <div class="thpt-options-grid" [class.thpt-options-col]="sec.type === 'sentence_arrangement'">
+            <div class="thpt-option-label"
+              *ngFor="let opt of q.options"
+              [class.selected]="thptAnswers[q.id] === opt.label"
+              [class.correct]="isReviewMode && opt.label === q.answerLabel"
+              [class.wrong]="isReviewMode && thptAnswers[q.id] === opt.label && opt.label !== q.answerLabel"
+              (click)="selectTHPTAnswer(q.id, opt.label)">
+              <div class="thpt-option-circle">{{ opt.label }}</div>
+              <span>{{ opt.text }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== THPT CONFIRM MODAL ===== -->
+<div class="thpt-confirm-overlay" [class.show]="showConfirm">
+  <div class="thpt-confirm-box">
+    <h3>Xác nhận nộp bài</h3>
+    <p>Bạn còn <strong>{{ thptUnansweredCount }}</strong> câu chưa trả lời.<br>Bạn có chắc chắn muốn nộp bài không?</p>
+    <div class="thpt-confirm-row">
+      <button class="thpt-btn-cancel" (click)="closeConfirm()">Quay lại</button>
+      <button class="thpt-btn-ok" (click)="doSubmit()">Nộp bài</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== THPT RESULT MODAL ===== -->
+<div class="thpt-result-overlay" [class.show]="showResultModal">
+  <div class="thpt-result-box">
+    <div class="thpt-score-ring">
+      <div class="thpt-score-num">{{ resultScore }}</div>
+      <div class="thpt-score-den">/ 100</div>
+    </div>
+    <h2>Kết quả bài thi</h2>
+    <div class="thpt-stats">
+      <div class="thpt-stat correct"><div class="thpt-stat-val">{{ resultCorrect }}</div><div class="thpt-stat-label">Đúng</div></div>
+      <div class="thpt-stat wrong"><div class="thpt-stat-val">{{ resultWrong }}</div><div class="thpt-stat-label">Sai</div></div>
+      <div class="thpt-stat skip"><div class="thpt-stat-val">{{ resultSkip }}</div><div class="thpt-stat-label">Bỏ qua</div></div>
+    </div>
+    <button class="thpt-modal-btn btn-review" (click)="reviewMode()">Xem đáp án</button>
+    <button class="thpt-modal-btn btn-retry" (click)="retryTHPTExam()">Làm lại từ đầu</button>
+  </div>
+</div>
+
+<!-- ====================== PAGE: RESULT ====================== -->
+<div class="result-page" *ngIf="view==='result'">
+  <div class="result-card">
+    <div class="result-header">
+      <div class="result-icon">{{ scorePercent >= 70 ? '🏆' : scorePercent >= 50 ? '📊' : '📝' }}</div>
+      <h2 class="result-title">{{ scorePercent >= 70 ? 'Xuất sắc!' : scorePercent >= 50 ? 'Khá tốt!' : 'Cần cố gắng hơn!' }}</h2>
+      <p class="result-exam-name">{{ currentExam?.title }}</p>
+    </div>
+
+    <div class="score-circle-wrap">
+      <svg class="score-svg" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="#e3eef2" stroke-width="10"/>
+        <circle cx="60" cy="60" r="52" fill="none"
+          [attr.stroke]="scorePercent>=70?'#43a047':scorePercent>=50?'#fb8c00':'#e53935'"
+          stroke-width="10" stroke-linecap="round"
+          [attr.stroke-dasharray]="'327'"
+          [attr.stroke-dashoffset]="327 - (327 * scorePercent / 100)"
+          transform="rotate(-90 60 60)"/>
+      </svg>
+      <div class="score-inner">
+        <span class="score-num">{{ scorePercent }}%</span>
+        <span class="score-sub">{{ correctCount }}/{{ questions.length }}</span>
+      </div>
+    </div>
+
+    <div class="result-stats">
+      <div class="rstat green">
+        <span class="rstat-num">{{ correctCount }}</span>
+        <span class="rstat-label">✅ Đúng</span>
+      </div>
+      <div class="rstat red">
+        <span class="rstat-num">{{ questions.length - correctCount }}</span>
+        <span class="rstat-label">❌ Sai</span>
+      </div>
+      <div class="rstat blue">
+        <span class="rstat-num">{{ formatTime(timeTaken) }}</span>
+        <span class="rstat-label">⏱ Thời gian</span>
+      </div>
+    </div>
+
+    <div class="review-section">
+      <div class="review-header" (click)="showReview=!showReview">
+        <span>📋 Xem đáp án chi tiết</span>
+        <span>{{ showReview ? '▲' : '▼' }}</span>
+      </div>
+      <div class="review-list" *ngIf="showReview">
+        <div class="review-item" *ngFor="let q of questions; let qi = index">
+          <!-- sub-questions -->
+          <ng-container *ngIf="q.subQuestions">
+            <div class="ri-top" *ngFor="let sq of q.subQuestions">
+              <span class="ri-num">Câu {{ sq.id }}</span>
+              <span class="ri-result" [class.correct]="isSubAnswerCorrect(q, sq)" [class.wrong]="!isSubAnswerCorrect(q, sq)">
+                {{ isSubAnswerCorrect(q, sq) ? '✅ Đúng' : '❌ Sai' }}
+              </span>
+              <div class="ri-qtext">{{ sq.text }}</div>
+              <div class="ri-opts">
+                <span class="ri-opt" *ngFor="let o of sq.options; let oi=index"
+                  [class.correct-ans]="oi===sq.correct"
+                  [class.user-wrong]="isSubAnswerWrong(q, sq, oi)">
+                  {{ o }}
+                </span>
+              </div>
+            </div>
+          </ng-container>
+          <!-- normal question -->
+          <ng-container *ngIf="!q.subQuestions">
+            <div class="ri-top">
+              <span class="ri-num">Câu {{ q.id }}</span>
+              <span class="ri-result" [class.correct]="userAnswers[q.id]===q.correct" [class.wrong]="userAnswers[q.id]!==q.correct && userAnswers[q.id]!==undefined">
+                {{ userAnswers[q.id]===q.correct ? '✅ Đúng' : (userAnswers[q.id]!==undefined ? '❌ Sai' : '⏺ Chưa trả lời') }}
+              </span>
+            </div>
+            <div class="ri-qtext">{{ q.question || q.text }}</div>
+            <div class="ri-opts">
+              <span class="ri-opt" *ngFor="let o of q.options; let oi=index"
+                [class.correct-ans]="oi===q.correct"
+                [class.user-wrong]="userAnswers[q.id]===oi && oi!==q.correct">
+                {{ o }}
+              </span>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="ra-btn retry" (click)="retryExam()">🔄 Thi lại</button>
+      <button class="ra-btn home" (click)="view='list'">📋 Về danh sách đề</button>
+    </div>
+  </div>
+</div>

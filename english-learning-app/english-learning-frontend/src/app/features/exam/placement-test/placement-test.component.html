@@ -1,0 +1,72 @@
+<div class="placement-page">
+  <div class="wrap">
+
+    <div class="brand">
+      <div class="mark">Tự học <span>ENGLISH</span></div>
+      <div class="step">{{ stepText }}</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" [style.width]="progressWidth"></div></div>
+
+    <!-- INTRO -->
+    <section *ngIf="stage === 'intro'" class="intro">
+      <div class="hero-badge">Kiểm tra trình độ đầu vào</div>
+      <h1>Chào mừng bạn đến với <span class="accent">Tự học ENGLISH</span></h1>
+      <p>Trước khi bắt đầu hành trình, hãy làm bài kiểm tra nhỏ này để mình biết bạn đang ở đâu và gợi ý đúng lộ trình học theo khung CEFR (A1–C1).</p>
+      <div class="meta-row">
+        <div class="meta-item c1"><div class="n">20</div><div class="l">câu hỏi</div></div>
+        <div class="meta-item c2"><div class="n">~8</div><div class="l">phút</div></div>
+        <div class="meta-item c3"><div class="n">A1–C1</div><div class="l">thang đánh giá</div></div>
+      </div>
+      <button class="primary" (click)="start()">Bắt đầu kiểm tra</button>
+    </section>
+
+    <!-- QUIZ -->
+    <section *ngIf="stage === 'quiz'">
+      <div class="qcard">
+        <div class="qtag">{{ currentQ.tag }}</div>
+        <p class="qtext">{{ currentQ.q }}</p>
+        <div class="options">
+          <button
+            *ngFor="let opt of currentQ.opts; let i = index"
+            class="opt"
+            [class.selected]="answers[current] === i"
+            (click)="select(i)"
+          >{{ opt }}</button>
+        </div>
+      </div>
+      <div class="nav-row">
+        <button class="ghost" (click)="back()">{{ backLabel }}</button>
+        <button class="primary" (click)="next()" [disabled]="answers[current] === null">{{ nextLabel }}</button>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section *ngIf="stage === 'result'" class="result">
+      <h1>Kết quả của bạn</h1>
+      <div class="level-card" [style.background]="level.bg">
+        <div class="level-badge" [style.color]="level.fg">{{ level.code }}</div>
+        <div class="level-name" [style.color]="level.fg">{{ level.name }}</div>
+        <p class="desc">{{ level.desc }}</p>
+      </div>
+      <div class="score-line">Đúng <b>{{ score }}</b> / 20 câu</div>
+      <div class="breakdown">
+        <h2>GỢI Ý LỘ TRÌNH</h2>
+        <div class="brow" *ngFor="let step of roadmap">
+          <span class="dot"></span><span>{{ step }}</span>
+        </div>
+      </div>
+      <div class="save-note" *ngIf="saving">Đang lưu kết quả...</div>
+      <div class="save-error" *ngIf="!saving && errorMsg">
+        {{ errorMsg }}
+      </div>
+      <div class="result-actions">
+        <button class="primary" *ngIf="!errorMsg" (click)="goToLesson()" [disabled]="saving">
+          {{ saving ? 'Đang lưu...' : 'Vào bài học ngay' }}
+        </button>
+        <button class="primary" *ngIf="errorMsg" (click)="retrySave()">Thử lại</button>
+        <button class="ghost" (click)="retake()">Làm lại bài kiểm tra</button>
+      </div>
+    </section>
+
+  </div>
+</div>

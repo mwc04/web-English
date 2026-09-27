@@ -1,0 +1,267 @@
+<!-- <div class="topbar">
+  <div class="topbar-left">
+    <a class="brand" (click)="goHome()">TỰ HỌC ENGLISH</a>
+    <span class="divider">|</span>
+    <nav class="breadcrumb">
+      <span>Luyện nghe</span>
+      <span>›</span>
+      <span>{{ typeLabel }}</span>
+      <span>›</span>
+      <span class="current">{{ exercise?.title || 'Bài nghe' }}</span>
+    </nav>
+  </div>
+  <button class="back-btn" (click)="goBack()">
+    <i class="ti ti-arrow-left"></i> Quay lại
+  </button>
+</div> -->
+
+<div class="layout">
+  <div>
+    <div class="card">
+
+      <div class="lesson-header">
+        <div class="tags">
+          <span class="tag tag-topic">{{ typeLabel }}</span>
+          <span class="tag tag-level">{{ exercise?.level || 'A1' }}</span>
+          <span class="tag tag-easy">{{ diffLabel }}</span>
+        </div>
+        <h1 class="lesson-title">{{ exercise?.title || 'Bài nghe' }}</h1>
+        <div class="lesson-meta">
+          <span><i class="ti ti-clock"></i> {{ formatTime(duration) }} phút</span>
+          <span><i class="ti ti-message-circle"></i> {{ questionCount }} câu hỏi</span>
+          <span><i class="ti ti-book"></i> {{ vocabs.length }} từ vựng</span>
+          <span><i class="ti ti-users"></i> {{ lines.length > 0 ? '2 nhân vật' : '-' }}</span>
+        </div>
+      </div>
+
+      <div class="audio-section">
+        <div class="section-label">Bản nghe</div>
+        <div class="waveform" (click)="onWaveClick($event)">
+          <div class="waveform-bar" *ngFor="let h of waveHeights; let i = index" [style.height.px]="h" [style.background]="(i / waveHeights.length) < pct / 100 ? '#22a06b' : '#d1d5db'"></div>
+        </div>
+        <div class="progress-row">
+          <span class="time-label">{{ formatTime(currentSec) }}</span>
+          <div class="progress-track" (click)="onProgressClick($event)" (mousedown)="onProgressDragStart($event)" (touchstart)="onProgressTouchStart($event)" (mouseleave)="onTrackMouseLeave()">
+            <div class="progress-fill" [style.width.%]="pct"></div>
+            <div class="progress-handle" [style.left.%]="pct" [class.active]="dragging"></div>
+          </div>
+          <span class="time-label">{{ formatTime(duration) }}</span>
+        </div>
+        <div class="controls">
+          <button class="ctrl-btn" title="Tua lại 10 giây" (click)="seek(-10)">
+            <i class="ti ti-player-skip-back"></i>
+          </button>
+          <button class="play-btn" (click)="togglePlay()">
+            <i class="ti" [ngClass]="playing ? 'ti-player-pause' : 'ti-player-play'"></i>
+          </button>
+          <button class="ctrl-btn" title="Tua tới 10 giây" (click)="seek(10)">
+            <i class="ti ti-player-skip-forward"></i>
+          </button>
+          <div class="volume-wrap">
+            <button class="ctrl-btn" (click)="toggleMute()">
+              <i class="ti" [ngClass]="muted ? 'ti-volume-off' : 'ti-volume'"></i>
+            </button>
+            <input type="range" class="volume-slider" min="0" max="100" value="80" (input)="setVolume($event)" />
+          </div>
+          <div class="speed-group">
+            <button class="speed-btn" [class.active]="speed === 0.75" (click)="setSpeed(0.75)">0.75×</button>
+            <button class="speed-btn" [class.active]="speed === 1" (click)="setSpeed(1)">1×</button>
+            <button class="speed-btn" [class.active]="speed === 1.25" (click)="setSpeed(1.25)">1.25×</button>
+            <button class="speed-btn" [class.active]="speed === 1.5" (click)="setSpeed(1.5)">1.5×</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODE TABS -->
+      <div class="mode-tabs">
+        <button class="mode-tab" [class.active]="activeMode === 'full'" (click)="switchMode('full')">Nghe Full</button>
+        <button class="mode-tab" [class.active]="activeMode === 'check'" (click)="switchMode('check')">Nghe Check</button>
+        <button class="mode-tab" [class.active]="activeMode === 'dictation'" (click)="switchMode('dictation')">Nghe Chép</button>
+      </div>
+
+      <div class="transcript-section">
+
+        <!-- NGHE FULL -->
+        <div *ngIf="activeMode === 'full'">
+          <div class="section-head">
+            <div class="section-title">Hội thoại</div>
+            <div class="toggle-group">
+              <button class="toggle-btn" [class.active]="viewMode === 'both'" (click)="setView('both')">EN + VI</button>
+              <button class="toggle-btn" [class.active]="viewMode === 'en'" (click)="setView('en')">EN</button>
+              <button class="toggle-btn" [class.active]="viewMode === 'vi'" (click)="setView('vi')">VI</button>
+            </div>
+          </div>
+          <div id="transcript">
+            <div class="transcript-block" *ngFor="let line of lines; let i = index" (click)="jumpTo(line.sec)">
+              <div class="dialogue-line" [class.active]="i === currentLine">
+                <div class="avatar" [ngClass]="line.cls">{{ line.avatar }}</div>
+                <div class="dialogue-content">
+                  <div class="speaker-name">{{ line.speaker }}</div>
+                  <div class="en-text" [style.display]="viewMode === 'vi' ? 'none' : ''">{{ line.en }}</div>
+                  <div class="vi-text" [style.display]="viewMode === 'en' ? 'none' : ''">{{ line.vi }}</div>
+                </div>
+                <div class="ts-time">{{ line.time }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NGHE CHECK -->
+        <div *ngIf="activeMode === 'check'">
+          <div class="section-head">
+            <div class="section-title">Nghe Check</div>
+            <span style="font-size:12px;color:var(--text-tertiary)">Chọn đáp án đúng cho mỗi câu</span>
+          </div>
+          <div>
+            <div class="transcript-block" *ngFor="let line of lines; let li = index">
+              <div class="dialogue-line" style="align-items:flex-start">
+                <div class="avatar" [ngClass]="line.cls">{{ line.avatar }}</div>
+                <div class="dialogue-content" style="width:100%">
+                  <div class="speaker-name">{{ line.speaker }} · <span style="color:var(--text-tertiary)">{{ line.time }}</span></div>
+                  <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">{{ line.vi }}</div>
+                  <ul class="answer-options">
+                    <li class="answer-option" *ngFor="let opt of getCheckOptions(li); let oi = index"
+                      (click)="answerCheck(li, oi)"
+                      [class.correct]="checkState[li] && checkState[li].answered && getCorrectCheckIdx(li) === oi"
+                      [class.wrong]="isCheckWrong(li, oi)"
+                      style="cursor:pointer">
+                      {{ letters[oi] }}. {{ opt.text }}
+                    </li>
+                  </ul>
+                  <div class="dict-result" [class.show]="checkState[li] && checkState[li].answered"
+                    [class.ok]="isCheckCorrect(li)"
+                    [class.err]="!isCheckCorrect(li) && checkState[li] && checkState[li].answered">
+                    {{ isCheckCorrect(li) ? '✓ Đúng!' : '✗ Sai! Đáp án đúng đã được tô xanh.' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NGHE CHÉP -->
+        <div *ngIf="activeMode === 'dictation'">
+          <div class="dict-nav">
+            <button class="dict-nav-btn" (click)="dictPrev()" title="Câu trước"><i class="ti ti-chevron-left"></i></button>
+            <button class="dict-play-btn" (click)="dictPlayCurrent()"><i class="ti" [class.ti-player-play]="!playing" [class.ti-player-pause]="playing"></i></button>
+            <button class="dict-nav-btn" (click)="dictNext()" title="Câu tiếp"><i class="ti ti-chevron-right"></i></button>
+            <span class="dict-counter">{{ dictIdx + 1 }} / {{ lines.length }}</span>
+            <span class="dict-speed-display">{{ speed }}×</span>
+            <button class="dict-loop-btn" [class.active]="dictLoop" (click)="toggleDictLoop()" title="Lặp câu này">
+              <i class="ti ti-repeat"></i>
+            </button>
+            <div class="hide-level-group">
+              <button class="hide-btn" [class.active]="hideLevel === 30" (click)="setHideLevel(30)">30%</button>
+              <button class="hide-btn" [class.active]="hideLevel === 50" (click)="setHideLevel(50)">50%</button>
+              <button class="hide-btn" [class.active]="hideLevel === 100" (click)="setHideLevel(100)">100%</button>
+            </div>
+          </div>
+
+          <div class="dict-sentence-box">
+            <ng-container *ngFor="let tok of dictTokens; let ti = index; let last = last">
+              <span class="word-slot">
+                <span *ngIf="dictState.hidden.includes(ti) && !dictState.revealed.includes(ti)"
+                  class="word-blank"
+                  [style.width.px]="getBlankWidth(tok)"
+                  (click)="revealWord(ti)"
+                  title="Nhấn để lật"></span>
+                <span *ngIf="!dictState.hidden.includes(ti) || dictState.revealed.includes(ti)"
+                  class="word-visible"
+                  [style.color]="dictState.revealed.includes(ti) ? '#22a06b' : ''">{{ tok }}</span>
+              </span>
+              <span *ngIf="!last">&nbsp;</span>
+            </ng-container>
+          </div>
+
+          <div class="dict-input-row">
+            <input class="dict-input" [(ngModel)]="dictInput" placeholder="Gõ những gì bạn nghe được..."
+              (keydown)="onDictKeyDown($event)"
+              [class.correct]="dictResultType === 'ok'"
+              [class.wrong]="dictResultType === 'err'" />
+            <button class="dict-submit-btn" (click)="checkDictation()">Kiểm tra</button>
+          </div>
+
+          <div class="dict-result" [class.show]="dictResultType !== ''"
+            [class.ok]="dictResultType === 'ok'"
+            [class.err]="dictResultType === 'err'"
+            [innerHTML]="dictResultText"></div>
+
+          <div class="dict-action-row">
+            <div class="dict-hint-btns">
+              <button class="hint-btn" (click)="revealHint(1)"><i class="ti ti-eye"></i> 1 từ</button>
+              <button class="hint-btn" (click)="revealHint(2)"><i class="ti ti-eye"></i> 2 từ</button>
+              <button class="hint-btn" (click)="revealHint(3)"><i class="ti ti-eye"></i> 3 từ</button>
+              <button class="hint-btn" (click)="revealHint(999)"><i class="ti ti-eye"></i> Tất cả</button>
+            </div>
+            <button class="reset-btn" (click)="resetDictation()"><i class="ti ti-refresh"></i> Reset</button>
+          </div>
+
+          <div class="shortcut-bar">
+            <span><kbd>Ctrl</kbd> phát lại</span>
+            <span><kbd>Tab</kbd> lật từ</span>
+            <span><kbd>Enter</kbd> câu tiếp theo</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="complete-banner" [class.show]="!playing && currentSec >= duration && duration > 0">
+        <i class="ti ti-circle-check-filled"></i>
+        <span><strong>Hoàn thành!</strong> Bạn đã nghe xong bài này.</span>
+        <button class="next-btn">Bài tiếp theo <i class="ti ti-arrow-right"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="side-card">
+      <div class="side-title"><i class="ti ti-chart-pie"></i> Tiến độ bài học</div>
+      <div class="ring-wrap">
+        <svg width="76" height="76" viewBox="0 0 76 76">
+          <circle cx="38" cy="38" r="30" fill="none" stroke="#f3f4f6" stroke-width="8"/>
+          <circle cx="38" cy="38" r="30" fill="none" stroke="#22a06b" stroke-width="8"
+            stroke-dasharray="188.5" [attr.stroke-dashoffset]="ringOffset"
+            stroke-linecap="round" transform="rotate(-90 38 38)"
+            style="transition: stroke-dashoffset 0.4s ease"/>
+          <text x="38" y="43" text-anchor="middle" font-size="14" font-weight="700" fill="#22a06b">{{ pct | number:'1.0-0' }}%</text>
+        </svg>
+        <div class="stat-group">
+          <div class="stat-item"><span class="stat-label">Đã nghe</span><span class="stat-val">{{ formatTime(currentSec) }} / {{ formatTime(duration) }}</span></div>
+          <div class="stat-item"><span class="stat-label">Câu hỏi</span><span class="stat-val">{{ answeredCount }} / {{ questionCount }}</span></div>
+          <div class="stat-item"><span class="stat-label">Từ vựng</span><span class="stat-val">{{ vocabSeenCount }} / {{ vocabs.length }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="side-title"><i class="ti ti-help-circle"></i> Câu hỏi kiểm tra</div>
+      <div class="question-list">
+        <div class="q-item" *ngFor="let q of questions; let i = index" [class.answered]="answered[i+1]" (click)="toggleQuestion(i+1)">
+          <div class="q-num">Câu {{ i + 1 }}</div>
+          <div class="q-text">{{ q.question }}</div>
+          <div class="q-status" [class.text-green]="answered[i+1]">{{ answered[i+1] ? '✓ Đã trả lời' : 'Nhấn để trả lời' }}</div>
+          <div class="answer-popup" [id]="'q-popup-' + (i+1)">
+            <ul class="answer-options">
+              <li class="answer-option" *ngFor="let opt of q.options; let j = index" (click)="answerQ(i+1, letters[j], $event)">{{ letters[j] }}. {{ opt }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-card">
+      <div class="side-title"><i class="ti ti-vocabulary"></i> Từ vựng nổi bật</div>
+      <div class="vocab-list">
+        <div class="vocab-item" *ngFor="let v of vocabs; let vi = index">
+          <div>
+            <div class="vocab-word">{{ v.word }}</div>
+            <div class="vocab-mean">{{ v.mean }}</div>
+          </div>
+          <button class="vocab-play" (click)="playVocab(vi)" title="Nghe phát âm">
+            <i class="ti ti-volume"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

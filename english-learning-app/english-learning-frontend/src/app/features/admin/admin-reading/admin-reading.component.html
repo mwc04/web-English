@@ -1,0 +1,229 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý Video</h1>
+    <button class="btn btn-primary" (click)="openAdd()">+ Thêm video</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filter-bar">
+    <input type="text" placeholder="Tìm kiếm tiêu đề..." [(ngModel)]="searchQuery" (input)="fetchItems()" />
+    <select [(ngModel)]="filterTag" (change)="fetchItems()">
+      <option value="">Tất cả tag</option>
+      <option *ngFor="let t of tags" [value]="t">{{ t }}</option>
+    </select>
+    <select [(ngModel)]="filterLevel" (change)="fetchItems()">
+      <option value="">Tất cả level</option>
+      <option *ngFor="let l of levels" [value]="l">{{ l }}</option>
+    </select>
+    <select [(ngModel)]="filterPro" (change)="fetchItems()">
+      <option value="">Tất cả</option>
+      <option value="true">PRO</option>
+      <option value="false">Thường</option>
+    </select>
+  </div>
+
+  <table class="admin-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th style="width:40px"></th>
+        <th>Tiêu đề</th>
+        <th>Level</th>
+        <th>Tags</th>
+        <th>PRO</th>
+        <th>Lượt nghe</th>
+        <th>Ngày tạo</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of filteredItems">
+        <td>
+          <span class="preview-emoji" [style.background]="item.bg || '#dceeff'">{{ item.emoji || '🎬' }}</span>
+        </td>
+        <td>
+          <div class="cell-title">
+            <strong>{{ item.title }}</strong>
+            <span class="cell-url" *ngIf="item.videoUrl">{{ item.videoUrl | slice:0:35 }}...</span>
+          </div>
+        </td>
+        <td><span class="level-badge" [class]="'level-' + (item.level || 'A1')">{{ item.level || '—' }}</span></td>
+        <td>
+          <span class="mini-tag" *ngFor="let t of (item.tags || []).slice(0,2)">{{ t }}</span>
+          <span class="mini-tag more" *ngIf="(item.tags || []).length > 2">+{{ item.tags.length - 2 }}</span>
+        </td>
+        <td>{{ item.pro ? '⭐' : '—' }}</td>
+        <td>{{ item.views || '0' }}</td>
+        <td>{{ item.createdAt | date:'dd/MM/yyyy' }}</td>
+        <td class="actions">
+          <button class="btn-icon edit" (click)="openEdit(item)" title="Sửa">✏️</button>
+          <button class="btn-icon delete" (click)="deleteItem(item._id)" title="Xóa">🗑️</button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredItems.length === 0">
+        <td colspan="8" class="text-center">Không có dữ liệu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+</div>
+
+<!-- Slide-over panel -->
+<div class="slide-overlay" [class.open]="showSlide" (click)="showSlide = false">
+  <div class="slide-panel" (click)="$event.stopPropagation()">
+    <div class="slide-header">
+      <h2>{{ editItem ? 'Sửa video' : 'Thêm video' }}</h2>
+      <button class="slide-close" (click)="showSlide = false">✕</button>
+    </div>
+
+    <div class="slide-body">
+      <!-- YouTube URL & Thumbnail -->
+      <div class="form-group">
+        <label>YouTube URL</label>
+        <input type="text" [(ngModel)]="formData.videoUrl" (input)="onUrlChange()" placeholder="https://www.youtube.com/watch?v=..." />
+        <div class="thumb-preview" *ngIf="getThumbnail(formData.videoUrl)">
+          <img [src]="getThumbnail(formData.videoUrl)" alt="thumbnail" />
+          <span class="thumb-id">{{ parseYoutubeId(formData.videoUrl) }}</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Tiêu đề</label>
+        <input type="text" [(ngModel)]="formData.title" placeholder="VD: Morning Routine — Everyday English" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Danh mục</label>
+          <select [(ngModel)]="formData.category">
+            <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Level</label>
+          <div class="btn-group">
+            <button *ngFor="let l of levels"
+              class="btn-level" [class.active]="formData.level === l"
+              (click)="formData.level = l">{{ l }}</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Thời lượng</label>
+          <input type="text" [(ngModel)]="formData.duration" placeholder="VD: 03:12" />
+        </div>
+        <div class="form-group">
+          <label>Lượt xem</label>
+          <input type="text" [(ngModel)]="formData.views" placeholder="VD: 35,140" />
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-group">
+        <label>Tags</label>
+        <div class="tags-grid">
+          <label class="tag-check" *ngFor="let t of tags" [class.checked]="formData.tags.includes(t)">
+            <input type="checkbox" [checked]="formData.tags.includes(t)" (change)="toggleTag(t)" />
+            <span>{{ t }}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Toggles -->
+      <div class="form-row toggles">
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="formData.is_pro" />
+          <span class="toggle-switch"></span>
+          <span>PRO</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="formData.enable_dictation" />
+          <span class="toggle-switch"></span>
+          <span>Dictation</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="formData.enable_shadowing" />
+          <span class="toggle-switch"></span>
+          <span>Shadowing</span>
+        </label>
+      </div>
+
+      <!-- Emoji & BG -->
+      <div class="form-row">
+        <div class="form-group" style="flex:0 0 100px">
+          <label>Emoji</label>
+          <input type="text" [(ngModel)]="formData.emoji" placeholder="🎬" style="text-align:center;font-size:20px" />
+        </div>
+        <div class="form-group">
+          <label>Màu nền</label>
+          <div class="bg-picker">
+            <button *ngFor="let c of bgPresets"
+              class="bg-swatch" [style.background]="c"
+              [class.active]="formData.bg === c"
+              [class.dark]="c === '#2a2a2a'"
+              (click)="formData.bg = c" [title]="getBgLabel(c)">
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="checkbox-label">
+          <input type="checkbox" [(ngModel)]="formData.darkThumb" />
+          <span>Chữ trắng (nền tối)</span>
+        </label>
+      </div>
+
+      <!-- Transcript editor -->
+      <div class="transcript-section">
+        <div class="section-title-row">
+          <h3>Transcript</h3>
+          <button class="btn btn-sm" (click)="addTranscriptRow()">+ Thêm câu</button>
+        </div>
+        <table class="transcript-table">
+          <thead>
+            <tr>
+              <th style="width:30px">#</th>
+              <th>Tiếng Anh</th>
+              <th>Tiếng Việt</th>
+              <th style="width:120px">IPA (JSON)</th>
+              <th style="width:80px"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let t of transcripts; let i = index; trackBy: trackByIndex">
+              <td class="td-num">
+                <span class="num">{{ i + 1 }}</span>
+                <button class="move-btn" (click)="moveTranscript(i, -1)" [disabled]="i === 0">▲</button>
+                <button class="move-btn" (click)="moveTranscript(i, 1)" [disabled]="i === transcripts.length - 1">▼</button>
+              </td>
+              <td>
+                <input type="text" [(ngModel)]="t.text_en" placeholder="English sentence..."
+                  (keydown)="onTranscriptKeydown($event, i)" />
+              </td>
+              <td>
+                <input type="text" [(ngModel)]="t.text_vi" placeholder="Dịch tiếng Việt..." />
+              </td>
+              <td>
+                <input type="text" [(ngModel)]="t.ipa_data" placeholder='{"word":"/ipa/"}' class="mono" />
+              </td>
+              <td>
+                <button class="btn-icon delete" (click)="removeTranscriptRow(i)" title="Xóa câu">✕</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn btn-sm btn-add-row" (click)="addTranscriptRow()">+ Thêm câu</button>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <button class="btn btn-cancel" (click)="showSlide = false">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="!formData.title || loading">
+        {{ loading ? 'Đang lưu...' : 'Lưu' }}
+      </button>
+    </div>
+  </div>
+</div>

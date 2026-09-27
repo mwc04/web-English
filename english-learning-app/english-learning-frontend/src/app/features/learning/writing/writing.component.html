@@ -1,0 +1,257 @@
+<div class="writing-app">
+
+  <!-- TOAST -->
+  <div class="toast" [class.success]="toastType==='success'" [class.error]="toastType==='error'"
+       [style.display]="toastVisible ? 'block' : 'none'">{{ toastMsg }}</div>
+
+  <!-- HINT POPUP -->
+  <div class="hint-popup" [class.show]="hintVisible" (click)="hintVisible=false">
+    <div class="hint-title">💡 Gợi ý</div>
+    <div>{{ currentSentence?.hint }}</div>
+  </div>
+
+  <!-- ===== SCREEN: HOME ===== -->
+  <div class="screen" [class.active]="screen==='home'" id="screen-home">
+    <h1 class="page-title">Paragraph Writing</h1>
+
+    <div class="home-inner">
+      <p class="section-label">Choose Your Level</p>
+      <div class="level-grid">
+        <div class="level-card" [class.selected]="selectedLevel==='beginner'" (click)="selectLevel('beginner')">
+          <div class="level-icon">🌱</div>
+          <div class="level-name">Beginner</div>
+          <div class="level-desc">Perfect for those just starting their English journey. Simple sentences and basic vocabulary.</div>
+          <div class="level-time">15–20 min per lesson</div>
+        </div>
+        <div class="level-card" [class.selected]="selectedLevel==='intermediate'" (click)="selectLevel('intermediate')">
+          <div class="level-icon">⭐</div>
+          <div class="level-name">Intermediate</div>
+          <div class="level-desc">For learners ready to tackle more complex sentences and varied vocabulary.</div>
+          <div class="level-time">20–30 min per lesson</div>
+        </div>
+        <div class="level-card" [class.selected]="selectedLevel==='advanced'" (click)="selectLevel('advanced')">
+          <div class="level-icon">👑</div>
+          <div class="level-name">Advanced</div>
+          <div class="level-desc">Challenge yourself with sophisticated texts and professional vocabulary.</div>
+          <div class="level-time">30–40 min per lesson</div>
+        </div>
+      </div>
+
+      <p class="section-label">Select Content Type</p>
+      <div class="content-grid">
+        <div class="content-card" [class.selected]="selectedType==='emails'" (click)="selectType('emails')">
+          <div class="content-icon">✉️</div>
+          <div class="content-name">Emails</div>
+          <div class="content-desc">Business and personal correspondence</div>
+        </div>
+        <div class="content-card" [class.selected]="selectedType==='diaries'" (click)="selectType('diaries')">
+          <div class="content-icon">📔</div>
+          <div class="content-name">Diaries</div>
+          <div class="content-desc">Personal reflections and experiences</div>
+        </div>
+        <div class="content-card" [class.selected]="selectedType==='essays'" (click)="selectType('essays')">
+          <div class="content-icon">✏️</div>
+          <div class="content-name">Essays</div>
+          <div class="content-desc">Academic and opinion pieces</div>
+        </div>
+        <div class="content-card" [class.selected]="selectedType==='articles'" (click)="selectType('articles')">
+          <div class="content-icon">📰</div>
+          <div class="content-name">Articles</div>
+          <div class="content-desc">News and magazine content</div>
+        </div>
+        <div class="content-card" [class.selected]="selectedType==='stories'" (click)="selectType('stories')">
+          <div class="content-icon">📖</div>
+          <div class="content-name">Stories</div>
+          <div class="content-desc">Short stories and narratives</div>
+        </div>
+        <div class="content-card" [class.selected]="selectedType==='reports'" (click)="selectType('reports')">
+          <div class="content-icon">📊</div>
+          <div class="content-name">Reports</div>
+          <div class="content-desc">Business and research reports</div>
+        </div>
+      </div>
+
+      <button class="start-btn" (click)="goTo('list')">Browse Exercises →</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: LIST ===== -->
+  <div class="screen" [class.active]="screen==='list'" id="screen-list">
+    <div class="breadcrumb">
+      <a (click)="goTo('home')">Writing</a>
+      <span>›</span>
+      <span>{{ cap(selectedLevel) }}</span>
+      <span>›</span>
+      <span>{{ cap(selectedType) }}</span>
+    </div>
+
+    <div class="list-header">
+      <h2 class="section-label" style="margin:0">Available Exercises</h2>
+      <div class="filter-group">
+        <span class="filter-label">Filter Topic:</span>
+        <select class="filter-select"><option>All</option></select>
+        <span class="filter-label">Filter Status:</span>
+        <select class="filter-select"><option>All</option></select>
+      </div>
+    </div>
+
+    <div class="exercise-grid">
+      <div class="exercise-card" *ngFor="let ex of filteredExercises" (click)="startExercise(ex)">
+        <div class="exercise-header">
+          <div class="exercise-title">{{ ex.title }}</div>
+          <span class="badge" [ngClass]="badgeClass(ex.status)">{{ badgeText(ex.status) }}</span>
+        </div>
+        <div class="attempt-tag">Attempt: {{ ex.attempts }}</div>
+        <div class="exercise-preview">{{ ex.preview }}</div>
+        <div class="exercise-footer">
+          <div class="exercise-meta">
+            <span>🕒 {{ ex.lastAttempt }}</span>
+            <span>| {{ ex.topic }}</span>
+          </div>
+          <button class="btn-start" (click)="startExercise(ex);$event.stopPropagation()">Start Exercise</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: EXERCISE ===== -->
+  <div class="screen" [class.active]="screen==='exercise'" id="screen-exercise">
+    <div class="exercise-top">
+      <div class="exercise-top-title">{{ currentExercise?.title }}</div>
+      <div class="exercise-stats">
+        <div class="stat-item"><span class="ico">🪙</span> <span>{{ credits }}</span> credits</div>
+        <div class="stat-item"><span class="ico">⭐</span> <span>{{ points }}</span> points</div>
+        <span class="progress-label">Progress: {{ currentSentenceIdx }}/{{ totalSentences }} sentences</span>
+      </div>
+    </div>
+
+    <div class="progress-bar"><div class="progress-fill" [style.width.%]="progressPct"></div></div>
+
+    <div class="exercise-body">
+      <!-- LEFT -->
+      <div class="text-panel">
+        <div class="vn-text">
+          <span class="sentence done" *ngFor="let s of doneSentences()" (click)="lookupWord(s.vn, s.en)">{{ s.vn }} </span>
+          <span class="sentence active" *ngIf="currentSentence" (click)="lookupWord(currentSentence!.vn, currentSentence!.en)">{{ currentSentence!.vn }} </span>
+          <span class="sentence" *ngFor="let s of remainingSentences().slice(1)" (click)="lookupWord(s.vn, s.en)">{{ s.vn }} </span>
+        </div>
+        <div class="input-area">
+          <div class="input-label">Dịch câu được tô sáng sang tiếng Anh:</div>
+          <textarea id="answer-input" [(ngModel)]="answerText" placeholder="Enter your English translation here… (Only highlighted sentence)"></textarea>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-panel">
+        <!-- Dictionary / Accuracy -->
+        <div class="panel-box">
+          <div class="panel-tabs">
+            <button class="tab-btn" [class.active]="activeTab==='dict'" (click)="openDictModal()">📖 Dictionary</button>
+            <button class="tab-btn" [class.active]="activeTab==='acc'" (click)="switchTab('acc')">🎯 Accuracy</button>
+          </div>
+          <div *ngIf="activeTab==='dict'" class="dict-panel-content">
+            <div style="text-align:center;padding:16px 0;color:var(--text-dim);font-size:13px">
+              📖 Nhấn nút <strong style="color:var(--gold)">Dictionary</strong> để xem từ vựng của bài học.
+            </div>
+          </div>
+          <div *ngIf="activeTab==='acc'">
+            <div class="accuracy-panel">
+              <div class="accuracy-ring" [style.border-color]="accuracyColor" [style.color]="accuracyColor">{{ averageAccuracy || '–' }}{{ averageAccuracy ? '%' : '' }}</div>
+              <div class="accuracy-label">Độ chính xác trung bình</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feedback -->
+        <div class="panel-box">
+          <div class="panel-title">💬 Feedback</div>
+          <div class="feedback-placeholder" *ngIf="!feedback && !loadingFeedback">
+            Nhấn <strong>Submit</strong> để nhận nhận xét từ AI. Hệ thống sẽ đánh giá bản dịch và chỉ ra điểm mạnh, điểm cần cải thiện.
+          </div>
+          <div class="loading-spinner" *ngIf="loadingFeedback">
+            <span class="spinner"></span> Đang đánh giá…
+          </div>
+          <div class="feedback-content" *ngIf="feedback && !loadingFeedback">
+            <div class="feedback-score">
+              <div class="score-circle" [style.border-color]="feedbackColor" [style.color]="feedbackColor">{{ feedback.score }}</div>
+              <div>
+                <div style="font-weight:700;font-size:15px">{{ feedbackScoreLabel }}</div>
+                <div class="score-label">Điểm câu này</div>
+              </div>
+            </div>
+            <div class="feedback-section" *ngIf="feedback.strengths?.length">
+              <div class="feedback-section-title">✨ Điểm mạnh</div>
+              <div class="feedback-item" *ngFor="let s of feedback.strengths">{{ s }}</div>
+            </div>
+            <div class="feedback-section" *ngIf="feedback.improvements?.length">
+              <div class="feedback-section-title">📝 Cần cải thiện</div>
+              <div class="feedback-item warning" *ngFor="let s of feedback.improvements">{{ s }}</div>
+            </div>
+            <div class="feedback-section" *ngIf="feedback.correctedVersion">
+              <div class="feedback-section-title">💡 Gợi ý đúng</div>
+              <div class="feedback-item" style="border-left-color:var(--blue);color:#93c5fd">{{ feedback.correctedVersion }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="panel-box">
+          <div class="panel-title">🏆 Today's Achievements</div>
+          <div class="achievements-grid">
+            <div class="achievement"><div class="achievement-icon">🔥</div><div class="achievement-name">2 Day Streak</div></div>
+            <div class="achievement"><div class="achievement-icon">💡</div><div class="achievement-name">Bright Mind</div></div>
+            <div class="achievement" [style.opacity]="firstSubmit ? '1' : '0.3'">
+              <div class="achievement-icon">🌟</div><div class="achievement-name">First Submit</div>
+            </div>
+            <div class="achievement" [style.opacity]="(averageAccuracy>=90 && totalAnswered>0) ? '1' : '0.3'">
+              <div class="achievement-icon">🎯</div><div class="achievement-name">Perfect Score</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="exercise-footer-bar">
+      <button class="btn btn-quit" (click)="goTo('list')">← Quit</button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-hint" (click)="toggleHint()">💡 Hint</button>
+        <button class="btn btn-submit" (click)="submitAnswer()" [disabled]="loadingFeedback || !answerText.trim()">
+          <span class="spinner" *ngIf="loadingFeedback"></span>
+          <span *ngIf="!loadingFeedback">Submit{{ currentSentenceIdx + 1 }} 🪙</span>
+          <span *ngIf="loadingFeedback">Đang đánh giá…</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DICTIONARY MODAL ===== -->
+  <div class="dict-modal-overlay" *ngIf="showDictModal" (click)="closeDictModal()">
+    <div class="dict-modal" (click)="$event.stopPropagation()">
+      <div class="dict-modal-header">
+        <span class="dict-modal-title">Dictionary</span>
+        <button class="dict-close-btn" (click)="closeDictModal()">✕</button>
+      </div>
+      <div class="dict-modal-body">
+        <div class="dict-word-grid">
+          <div class="dict-word-card" *ngFor="let w of dictWords">
+            <div class="dict-card-header">
+              <div class="dict-card-header-left">
+                <span class="dict-word-title">{{ w.word }}</span>
+                <button class="dict-sound-btn">🔊</button>
+              </div>
+              <button class="dict-add-btn">＋ Add to List</button>
+            </div>
+            <div><span class="dict-badge" [class.dict-badge-word]="w.type==='word'" [class.dict-badge-phrase]="w.type==='phrase'">{{ w.type==='word' ? 'Word' : 'Noun phrase' }}</span></div>
+            <div class="dict-meaning">Meaning: <span>{{ w.meaning }}</span></div>
+            <div class="dict-example" [innerHTML]="highlightExample(w.example, w.highlightWord)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="dict-modal-footer">
+        <button class="dict-footer-close-btn" (click)="closeDictModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+</div>

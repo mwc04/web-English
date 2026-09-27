@@ -1,0 +1,117 @@
+<div class="admin-page">
+  <div class="page-header">
+    <h1>Quản lý Bài Listening</h1>
+    <button class="btn btn-primary" (click)="openAdd()">+ Thêm mới</button>
+  </div>
+
+  <div class="search-bar">
+    <input type="text" placeholder="Tìm kiếm bài listening..." [(ngModel)]="searchQuery" (input)="applyFilter()" />
+  </div>
+
+  <table class="admin-table" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th>Tiêu đề</th>
+        <th>Audio</th>
+        <th>Trình độ</th>
+        <th>Ngày tạo</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of filteredItems">
+        <td>{{ item.title }}</td>
+        <td>
+          <span *ngIf="item.audio_type==='uploaded'" class="badge-upload">📁 Đã upload</span>
+          <span *ngIf="item.audio_type==='url'" class="badge-url">🔗 Link</span>
+          <span *ngIf="!item.audio_url" class="text-muted">—</span>
+          <button *ngIf="item.audio_url" class="btn-play-sm" (click)="playAudio($event, item)" title="Nghe thử">▶️</button>
+        </td>
+        <td>{{ item.level || '—' }}</td>
+        <td>{{ item.createdAt | date:'dd/MM/yyyy' }}</td>
+        <td class="actions">
+          <button class="btn-icon edit" (click)="openEdit(item)" title="Sửa">✏️</button>
+          <button class="btn-icon delete" (click)="deleteItem(item._id)" title="Xóa">🗑️</button>
+        </td>
+      </tr>
+      <tr *ngIf="filteredItems.length === 0">
+        <td colspan="5" class="text-center">Không có dữ liệu</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="loading" *ngIf="loading">Đang tải...</div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="showModal = false">
+  <div class="modal modal-lg" (click)="$event.stopPropagation()">
+    <h2>{{ editItem ? 'Sửa bài listening' : 'Thêm bài listening' }}</h2>
+
+    <div class="form-group">
+      <label>Tiêu đề</label>
+      <input type="text" [(ngModel)]="formData.title" placeholder="Nhập tiêu đề bài nghe" />
+    </div>
+
+    <div class="form-group">
+      <label>Phụ đề</label>
+      <input type="text" [(ngModel)]="formData.subtitle" placeholder="Mô tả ngắn" />
+    </div>
+
+    <!-- Audio source selector -->
+    <div class="form-group">
+      <label>Nguồn audio</label>
+      <div class="audio-tabs">
+        <button class="audio-tab" [class.active]="formData.audio_type==='url'" (click)="setAudioType('url')">🔗 Link từ mạng</button>
+        <button class="audio-tab" [class.active]="formData.audio_type==='uploaded'" (click)="setAudioType('uploaded')">📁 Tải file lên</button>
+      </div>
+    </div>
+
+    <!-- URL input -->
+    <div class="form-group" *ngIf="formData.audio_type==='url'">
+      <label>Đường dẫn audio (mp3, wav, ...)</label>
+      <input type="text" [(ngModel)]="formData.audio_url" (input)="onUrlChange()" placeholder="https://example.com/audio.mp3" />
+    </div>
+
+    <!-- File upload -->
+    <div class="form-group" *ngIf="formData.audio_type==='uploaded'">
+      <label>Chọn file audio từ thiết bị</label>
+      <div class="file-upload-area">
+        <input type="file" accept=".mp3,.wav,.ogg,.m4a,.aac,.webm" (change)="onFileSelected($event)" id="audioFileInput" />
+        <label for="audioFileInput" class="file-upload-label">
+          <span *ngIf="!uploading">📂 Nhấp để chọn file</span>
+          <span *ngIf="uploading">⏳ Đang tải lên...</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Audio preview -->
+    <div class="form-group" *ngIf="audioSrc">
+      <label>Nghe thử</label>
+      <audio controls style="width:100%" [src]="audioSrc"></audio>
+      <button class="btn btn-cancel btn-sm" (click)="clearAudio()" style="margin-top:4px">🗑️ Xoá audio</button>
+    </div>
+
+    <div class="form-group">
+      <label>Trình độ</label>
+      <select [(ngModel)]="formData.level" class="form-select">
+        <option value="">Chọn trình độ</option>
+        <option value="A1">A1 – Sơ cấp</option>
+        <option value="A2">A2 – Cơ bản</option>
+        <option value="B1">B1 – Trung cấp</option>
+        <option value="B2">B2 – Trên trung cấp</option>
+        <option value="C1">C1 – Nâng cao</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Transcript (nội dung bài nghe)</label>
+      <textarea rows="4" [(ngModel)]="formData.transcript" placeholder="Nội dung transcript..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-cancel" (click)="showModal = false">Hủy</button>
+      <button class="btn btn-primary" (click)="save()" [disabled]="!formData.title">Lưu</button>
+    </div>
+  </div>
+</div>
